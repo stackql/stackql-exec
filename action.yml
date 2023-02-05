@@ -31,6 +31,7 @@ runs:
       id: setup-auth
       shell: bash
       run: |
+        ls ./
         chmod +x ./action_scripts/set_auth_env.sh
         ./action_scripts/set_auth_env.sh
       env:

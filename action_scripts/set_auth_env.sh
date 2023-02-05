@@ -18,4 +18,4 @@ fi
 
 # Set the AUTH environment variable
 echo "Setting AUTH environment variable..."
-echo  "AUTH='$AUTH'" >> "$GITHUB_ENV"
+echo  "AUTH=$AUTH" >> "$GITHUB_ENV"

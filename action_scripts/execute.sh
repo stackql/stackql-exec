@@ -8,7 +8,7 @@ if [ -z "$AUTH" ]; then
 fi
 
 if [ -z "$QUERY_FILE_PATH" ]; then
-  stackql exec "$QUERY" --auth="${AUTH}"
+  stackql exec "$QUERY" --auth="${AUTH}" --output="${OUTPUT}" 
 else
-  stackql exec -i "$QUERY_FILE_PATH" --auth="${AUTH}"  
+  stackql exec -i "$QUERY_FILE_PATH" --auth="${AUTH}" --output="'${OUTPUT}'" 
 fi

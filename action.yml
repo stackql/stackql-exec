@@ -5,7 +5,7 @@ inputs:
   auth_obj_path:
     description: file path to json object of stackql auth
     required: false
-  auth-string:
+  auth_str:
     description: json string of stackql auth
     required: false
   query:

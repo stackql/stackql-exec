@@ -32,7 +32,7 @@ runs:
       shell: bash
       run: |
         chmod +x action_scripts/set_auth_env.sh
-        ./action_scripts//set_auth_env.sh
+        ./action_scripts/set_auth_env.sh
       env:
         AUTH_FILE: ${{inputs.auth_obj_path}}
 

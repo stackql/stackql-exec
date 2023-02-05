@@ -1,0 +1,54 @@
+name: 'StackQL Studios - stackql-exec'
+description: 'A wrapper for executing a single command, maps all stackql exec args to actions args (supplied using with.'
+author: 'Yuncheng Yang, StackQL Studios'
+inputs:
+  auth_obj_path:
+    description: file path to json object of stackql auth
+    required: false
+  auth-string:
+    description: json string of stackql auth
+    required: false
+  query:
+    description: stackql query to be executed
+    required: false
+  query_file_path:
+    description: stackql query file to be executed
+    required: false
+  query_output:
+    description: output format
+    default: 'json'
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup StackQL
+      uses: stackql/setup-stackql@v1.1.0-beta
+      with:
+        use_wrapper: true
+
+    - name: Setup use Auth
+      id: setup-auth
+      shell: bash
+      run: |
+        chmod +x set_auth_env.sh
+        ./set_auth_env.sh
+      env:
+        AUTH_FILE: ${{inputs.auth_obj_path}}
+
+    - name: Execute query
+      if: ${{ inputs.auth_obj != ''}}
+      shell: bash
+      run: |
+        chmod +x set_auth_env.sh
+        ./set_auth_env.sh
+      env:
+        QUERY_FILE_PATH: ${{ inputs.query_file_path }}
+        QUERY: ${{inputs.query}}
+        AUTH:  ${{ env.AUTH }}
+        OUTPUT: ${{inputs.query_output}}
+    
+      
+branding:
+  icon: 'terminal'
+  color: 'green'

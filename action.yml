@@ -35,6 +35,7 @@ runs:
         ./action_scripts/set_auth_env.sh
       env:
         AUTH_FILE: ${{inputs.auth_obj_path}}
+        AUTH_STR: ${{inputs.auth_str}}
 
     - name: Execute query
       shell: bash

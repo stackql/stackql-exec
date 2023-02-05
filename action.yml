@@ -45,7 +45,6 @@ runs:
       env:
         QUERY_FILE_PATH: ${{ inputs.query_file_path }}
         QUERY: ${{inputs.query}}
-        AUTH:  ${{ env.AUTH }}
         OUTPUT: ${{inputs.query_output}}
     
       

@@ -48,3 +48,5 @@ jobs:
                   select total_private_repos
                   from github.orgs.orgs
                   where org = 'stackql';"
+        env: 
+          STACKQL_GITHUB_CREDS: ${{  secrets.STACKQL_GITHUB_CREDS }}

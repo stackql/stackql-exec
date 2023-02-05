@@ -36,4 +36,4 @@ jobs:
         uses: ./
         with:
           auth_obj_path: './stackql_scripts/auth.json'
-          query_file_path: '/stackql_scripts/google-example.iql'
+          query_file_path: './stackql_scripts/google-example.iql'

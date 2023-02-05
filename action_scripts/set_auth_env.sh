@@ -2,7 +2,7 @@
 
 set -e
 
-FILE_NAME=${AUTH_FILE_NAME}
+FILE_NAME=${AUTH_FILE}
 
 if [ -z "$FILE_NAME" ]; then
   AUTH=${AUTH_STR}

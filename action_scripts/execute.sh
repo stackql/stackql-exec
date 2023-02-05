@@ -2,8 +2,6 @@
 
 set -e
 
-AUTH=${AUTH}
-
 if [ -z "$AUTH" ]; then
   echo "ERROR: AUTH must be set."
   exit 1

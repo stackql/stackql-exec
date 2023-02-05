@@ -31,7 +31,7 @@ runs:
       id: setup-auth
       shell: bash
       run: |
-        chmod +x action_scripts/set_auth_env.sh
+        chmod +x ./action_scripts/set_auth_env.sh
         ./action_scripts/set_auth_env.sh
       env:
         AUTH_FILE: ${{inputs.auth_obj_path}}
@@ -40,7 +40,7 @@ runs:
       if: ${{ inputs.auth_obj != ''}}
       shell: bash
       run: |
-        chmod +x action_scripts/execute.sh
+        chmod +x ./action_scripts/execute.sh
         ./action_scripts/execute.sh
       env:
         QUERY_FILE_PATH: ${{ inputs.query_file_path }}

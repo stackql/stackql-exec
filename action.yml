@@ -27,7 +27,7 @@ runs:
       with:
         use_wrapper: true
 
-    - name: Setup use Auth
+    - name: Setup auth
       id: setup-auth
       shell: bash
       run: |

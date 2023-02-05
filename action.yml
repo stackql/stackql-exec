@@ -37,7 +37,6 @@ runs:
         AUTH_FILE: ${{inputs.auth_obj_path}}
 
     - name: Execute query
-      if: ${{ inputs.auth_obj != ''}}
       shell: bash
       run: |
         chmod +x ./action_scripts/execute.sh

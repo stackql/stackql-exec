@@ -30,7 +30,7 @@ jobs:
       - name: Prep Google Creds (bash)
         if: ${{ matrix.os != 'windows-latest' }}
         shell: bash
-        run: | ## use the secret to create json file
+        run: | ## use the base64 encoded secret to create json file
           sudo echo ${{ secrets.GOOGLE_CREDS }} | base64 -d > sa-key.json
 
       - name: exec google example
@@ -38,3 +38,13 @@ jobs:
         with:
           auth_obj_path: './stackql_scripts/auth.json'
           query_file_path: './stackql_scripts/google-example.iql'
+
+      - name: exec github example
+        uses: ./
+        with:
+          auth_str: '{ "github": { "type": "basic", "credentialsenvvar": "STACKQL_GITHUB_CREDS" } }'
+          query: "REGISTRY PULL github v23.01.00104;
+                  SHOW PROVIDERS;
+                  select total_private_repos
+                  from github.orgs.orgs
+                  where org = 'stackql';"

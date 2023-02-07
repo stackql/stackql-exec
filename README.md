@@ -60,7 +60,7 @@ where org = 'stackql';
 ```
 
 
-## Input
+## Inputs
 - `auth_obj_path` - (optional) the path of json file that stores stackql AUTH string
 - `auth_str` - (optional) stackql AUTH string, need either auth_str or auth_obj_path
 - `query` - (optional) stackql query to execute

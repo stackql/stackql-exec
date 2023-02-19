@@ -3,6 +3,22 @@ Github Action as a wrapper for executing a single command in stackql, maps all s
 
 # Usage
 
+## AUTH
+
+`Example auth string`
+```
+{   "google": { "type": "service_account",  "credentialsfilepath": "sa-key.json" },
+    "github": { "type": "basic", "credentialsenvvar": "STACKQL_GITHUB_CREDS" }}
+```
+It can be passed with `auth_str` as a string, or stored in a file and pass filename to `auth-obj-path`
+- For "basic" auth, you need to set a environment variable with same name as the value of `credentialsenvvar` in the auth string for the Github Action step. You can use [Github Secrets](https://docs.github.com/en/actions/reference/encrypted-secrets) to store the value of the environment variable, and use env to pass it to the action. For example:
+```
+env:
+  STACKQL_GITHUB_CREDS: ${{ secrets.STACKQL_GITHUB_CREDS }}
+```
+- For "service_account" auth, you need to store the credentials into a file; You can follow the example of `Prep Google Creds (bash)` step in the example
+
+# Examples
 ## Basic Example
 ```
     - name: exec github example

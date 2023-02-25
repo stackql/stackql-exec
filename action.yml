@@ -29,22 +29,25 @@ runs:
 
     - name: Setup auth
       id: setup-auth
-      shell: bash
-      run: |
-        chmod +x ./action_scripts/set_auth_env.sh
-        ./action_scripts/set_auth_env.sh
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const {setupAuth} = require('./lib/utils.js')
+          setupAuth(core)
       env:
-        AUTH_FILE: ${{inputs.auth_obj_path}}
+        AUTH_FILE_PATH: ${{ inputs.auth_obj_path }}
         AUTH_STR: ${{inputs.auth_str}}
 
     - name: Execute query
-      shell: bash
-      run: |
-        chmod +x ./action_scripts/execute.sh
-        ./action_scripts/execute.sh
+      id: exec-query
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const {executeStackql} = require('./lib/utils.js')
+          await executeStackql(core, exec)
       env:
-        QUERY_FILE_PATH: ${{ inputs.query_file_path }}
-        QUERY: ${{inputs.query}}
+        QUERY_FILE_PATH: ${{ inputs.test_query_file_path }}
+        QUERY: ${{inputs.test_query}}
         OUTPUT: ${{inputs.query_output}}
     
       

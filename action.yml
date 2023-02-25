@@ -49,7 +49,7 @@ runs:
       with:
         script: |
           const {executeStackql} = require('./lib/utils.js')
-          await executeStackql(core, exec)
+          await executeStackql(core)
       env:
         QUERY_FILE_PATH: ${{ inputs.query_file_path }}
         QUERY: ${{inputs.query}}

@@ -50,9 +50,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     
-    - name: Validate Stackql Version
-      run: |
-        stackql --version
 
     - name: exec github example
       uses: ./

@@ -27,6 +27,11 @@ runs:
       with:
         use_wrapper: true
 
+    - name: Validate Stackql Version
+      shell: bash
+      run: |
+        stackql --version
+
     - name: Setup auth
       id: setup-auth
       uses: actions/github-script@v6

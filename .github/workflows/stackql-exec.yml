@@ -42,7 +42,7 @@ jobs:
   stackql-exec-github-example:
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{matrix.os}}
     name: 'StackQL exec Github '
 

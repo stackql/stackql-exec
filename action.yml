@@ -71,14 +71,11 @@ runs:
       run: |
         ${{ env.STACKQL_COMMAND }}
 
-    - name: validate exec-stackql output
+    - name: set output
       shell: bash
       run: |
         echo "exec-stackql output: ${{ steps.exec-stackql.outputs.stdout }}"
-        if [ -z ${{ steps.exec-stackql.outputs.stdout }} ]; then
-          echo "exec-stackql output does not contain expected result"
-          exit 1
-        fi
+      
 
       
 branding:

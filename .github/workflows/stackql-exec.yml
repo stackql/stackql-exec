@@ -34,14 +34,14 @@ jobs:
         sudo echo ${{ secrets.GOOGLE_CREDS }} | base64 -d > sa-key.json
 
     - name: exec google example with query file
-      id: exec-stackql-file
+      id: stackql-exec-file
       uses: ./
       with:
         auth_obj_path: './stackql_scripts/auth.json'
         query_file_path: './stackql_scripts/google-example.iql'
 
     - name: exec github example with query string
-      id: exec-stackql-string
+      id: stackql-exec-string
       uses: ./
       with:
         auth_str: '{ "github": { "type": "basic", "credentialsenvvar": "STACKQL_GITHUB_CREDS" } }'
@@ -52,5 +52,14 @@ jobs:
                 where org = 'stackql';"
       env: 
         STACKQL_GITHUB_CREDS: ${{ secrets.STACKQL_GITHUB_CREDS }}
+
+    - name: validate stackql-exec output
+      shell: bash
+      run: |
+        echo "stackql-exec output: ${{ steps.stackql-exec-file.outputs.stdout }}"
+        if [ -z ${{ steps.exec-stackql.outputs.stdout }} ]; then
+          echo "exec-stackql output does not contain expected result"
+          exit 1
+        fi
 
 

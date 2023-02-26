@@ -60,5 +60,9 @@ jobs:
           echo "exec-stackql output does not contain expected result"
           exit 1
         fi
+        if [ -z '${{ steps.stackql-exec-string.outputs.exec-result }}' ]; then
+          echo "exec-stackql output does not contain expected result"
+          exit 1
+        fi
 
 

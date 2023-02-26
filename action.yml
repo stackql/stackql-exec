@@ -43,18 +43,23 @@ runs:
         AUTH_FILE_PATH: ${{ inputs.auth_obj_path }}
         AUTH_STR: ${{inputs.auth_str}}
 
-    - name: Execute query
-      id: exec-query
+    - name: get stackql command
       uses: actions/github-script@v6
       with:
         script: |
-          const {executeStackql} = require('./lib/utils.js')
-          await executeStackql(core)
+          const {getStackqlCommand} = require('./lib/utils.js')
+          getStackqlCommand(core)
       env:
         QUERY_FILE_PATH: ${{ inputs.query_file_path }}
         QUERY: ${{inputs.query}}
         OUTPUT: ${{inputs.query_output}}
     
+    - name: execute stackql command
+      id: exec-stackql
+      shell: bash
+      run: |
+        echo "stackql command: ${{ env.STACKQL_COMMAND }}"
+        ${{ env.STACKQL_COMMAND }}
       
 branding:
   icon: 'terminal'

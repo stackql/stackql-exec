@@ -22,8 +22,19 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Check StackQL is installed and set output
+      id: check-stackql
+      shell: bash
+      run: |
+        if command -v stackql &> /dev/null; then
+            echo "stackql_installed=true" >> $GITHUB_OUTPUT
+        else
+            echo "stackql_installed=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Setup StackQL
       uses: stackql/setup-stackql@v1.1.0-beta
+      if: ${{steps.check-stackql.outputs.stackql_installed == 'false'}}
       with:
         use_wrapper: true
 
@@ -43,18 +54,32 @@ runs:
         AUTH_FILE_PATH: ${{ inputs.auth_obj_path }}
         AUTH_STR: ${{inputs.auth_str}}
 
-    - name: Execute query
-      id: exec-query
+    - name: get stackql command
       uses: actions/github-script@v6
       with:
         script: |
-          const {executeStackql} = require('./lib/utils.js')
-          await executeStackql(core)
+          const {getStackqlCommand} = require('./lib/utils.js')
+          getStackqlCommand(core)
       env:
         QUERY_FILE_PATH: ${{ inputs.query_file_path }}
         QUERY: ${{inputs.query}}
         OUTPUT: ${{inputs.query_output}}
     
+    - name: execute stackql command
+      id: exec-stackql
+      shell: bash
+      run: |
+        ${{ env.STACKQL_COMMAND }}
+
+    - name: validate exec-stackql output
+      shell: bash
+      run: |
+        echo "exec-stackql output: ${{ steps.exec-stackql.outputs.stdout }}"
+        if [ -z ${{ steps.exec-stackql.outputs.stdout }} ]; then
+          echo "exec-stackql output does not contain expected result"
+          exit 1
+        fi
+
       
 branding:
   icon: 'terminal'

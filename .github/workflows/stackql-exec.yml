@@ -33,24 +33,15 @@ jobs:
       run: | ## use the base64 encoded secret to create json file
         sudo echo ${{ secrets.GOOGLE_CREDS }} | base64 -d > sa-key.json
 
-    - name: exec google example
+    - name: exec google example with query file
+      id: exec-stackql-file
       uses: ./
       with:
         auth_obj_path: './stackql_scripts/auth.json'
         query_file_path: './stackql_scripts/google-example.iql'
 
-  stackql-exec-github-example:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{matrix.os}}
-    name: 'StackQL exec Github '
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: exec github example
+    - name: exec github example with query string
+      id: exec-stackql-string
       uses: ./
       with:
         auth_str: '{ "github": { "type": "basic", "credentialsenvvar": "STACKQL_GITHUB_CREDS" } }'
@@ -61,4 +52,5 @@ jobs:
                 where org = 'stackql';"
       env: 
         STACKQL_GITHUB_CREDS: ${{ secrets.STACKQL_GITHUB_CREDS }}
+
 

@@ -74,8 +74,8 @@ runs:
     - name: set output
       shell: bash
       run: |
-          echo "stackql_exec_stdout='${{ steps.exec-stackql.outputs.stdout }}'" >> $GITHUB_OUTPUT
-          echo "stackql_exec_stderr='${{ steps.exec-stackql.outputs.stderr }}'" >> $GITHUB_OUTPUT
+          echo "stackql_exec_stdout=${{ steps.exec-stackql.outputs.stdout }}" >> $GITHUB_OUTPUT
+          echo "stackql_exec_stderr=${{ steps.exec-stackql.outputs.stderr }}" >> $GITHUB_OUTPUT
       
 branding:
   icon: 'terminal'

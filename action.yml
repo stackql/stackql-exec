@@ -71,11 +71,13 @@ runs:
       run: |
         ${{ env.STACKQL_COMMAND }}
 
-    # - name: set output
-    #   shell: bash
-    #   run: |
-    #       echo "stackql_exec_stdout=${{ steps.exec-stackql.outputs.stdout }}" >> $GITHUB_OUTPUT
-    #       echo "stackql_exec_stderr=${{ steps.exec-stackql.outputs.stderr }}" >> $GITHUB_OUTPUT
+    - name: set output
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const {setOutput} = require('./lib/utils.js')
+          setOutput(core, 'result', ${{steps.exec-stackql.outputs.stdout}})
+          setOutput(core, 'error', ${{steps.exec-stackql.outputs.stderr}})
       
 branding:
   icon: 'terminal'

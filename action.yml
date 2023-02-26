@@ -76,8 +76,10 @@ runs:
       with:
         script: |
           const {setOutput} = require('./lib/utils.js')
-          setOutput(core, 'result', '${{steps.exec-stackql.outputs.stdout}}')
-          setOutput(core, 'error', '${{steps.exec-stackql.outputs.stderr}}')
+          const stdout = JSON.stringify('${{steps.exec-stackql.outputs.stdout}}')
+          const stderr = JSON.stringify('${{steps.exec-stackql.outputs.stderr}}')
+          setOutput(core, 'result', stdout)
+          setOutput(core, 'error', stderr)
       
 branding:
   icon: 'terminal'

@@ -56,8 +56,7 @@ jobs:
     - name: validate stackql-exec output
       shell: bash
       run: |
-        echo "stackql-exec output: ${{ steps.stackql-exec-file.outputs.exec-result }}"
-        if [ -z ${{ steps.stackql-exec-file.outputs.exec-result }} ]; then
+        if [ -z '${{ steps.stackql-exec-file.outputs.exec-result }}' ]; then
           echo "exec-stackql output does not contain expected result"
           exit 1
         fi

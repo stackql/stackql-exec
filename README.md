@@ -86,8 +86,7 @@ where org = 'stackql';
 
 ## Outputs
 This action uses [setup-stackql](https://github.com/marketplace/actions/stackql-studio-setup-stackql), with use_wrapper set
-to `true`, the following outputs are available for subsequent steps that call the `stackql` binary:
+to `true`, `stdout` and `stderr` are set to `exec-result` and `exec-error`
 
-- `stdout` - The STDOUT stream of the call to the `stackql` binary.
-- `stderr` - The STDERR stream of the call to the `stackql` binary.
-- `exitcode` - The exit code of the call to the `stackql` binary.
+- `exec-result` - The STDOUT stream of the call to the `stackql` binary.
+- `exec-error` - The STDERR stream of the call to the `stackql` binary.

@@ -22,8 +22,19 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Check StackQL is installed and set output
+      id: check-stackql
+      shell: bash
+      run: |
+        if command -v stackql &> /dev/null; then
+            echo "stackql_installed=true" >> $GITHUB_OUTPUT
+        else
+            echo "stackql_installed=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Setup StackQL
       uses: stackql/setup-stackql@v1.1.0-beta
+      if: ${{steps.check-stackql.outputs.stackql_installed == 'false'}}
       with:
         use_wrapper: true
 

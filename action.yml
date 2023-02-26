@@ -18,6 +18,13 @@ inputs:
     description: output format
     default: 'json'
     required: false
+outputs:
+  exec-result:
+    description: "stdout of stackql command"
+    value: ${{ steps.exec-stackql.outputs.stdout }}
+  exec-error:
+    description: "stderr of stackql command"
+    value: ${{ steps.exec-stackql.outputs.stderr }}
 
 runs:
   using: "composite"
@@ -70,14 +77,6 @@ runs:
       shell: bash
       run: |
         ${{ env.STACKQL_COMMAND }}
-
-    - name: set output
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const {setOutput} = require('./lib/utils.js')
-          setOutput(core, 'result', `${{steps.exec-stackql.outputs.stdout}}`)
-          setOutput(core, 'error', `${{steps.exec-stackql.outputs.stderr}}`)
       
 branding:
   icon: 'terminal'

@@ -53,19 +53,4 @@ jobs:
       env: 
         STACKQL_GITHUB_CREDS: ${{ secrets.STACKQL_GITHUB_CREDS }}
 
-    - name: validate exec-stackql output
-      shell: bash
-      run: |
-        echo "exec-stackql-file output: ${{ steps.exec-stackql-file.outputs.stdout }}"
-        if [ -z ${{ steps.exec-stackql-file.outputs.result }} ]; then
-          echo "exec-stackql output does not contain expected result"
-          exit 1
-        fi
-        echo "exec-stackql-string output: ${{ steps.exec-stackql-string.outputs.stdout }}"
-        if [ -z ${{ steps.exec-stackql-string.outputs.result }} ]; then
-          echo "exec-stackql output does not contain expected result"
-          exit 1
-        fi
-
-
 

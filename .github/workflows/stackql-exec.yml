@@ -1,4 +1,4 @@
-name: 'Setup StackQL'
+name: 'StackQL Exec Test'
 
 on:
   push:

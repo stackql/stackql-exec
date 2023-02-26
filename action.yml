@@ -1,5 +1,5 @@
-name: 'StackQL Studios - stackql-exec'
-description: 'A wrapper for executing a single command, maps all stackql exec args to actions args (supplied using with.'
+name: 'StackQL Studios - StackQL Exec'
+description: 'A wrapper for executing a single command, maps all stackql exec args to actions args (supplied using with.)'
 author: 'Yuncheng Yang, StackQL Studios'
 inputs:
   auth_obj_path:

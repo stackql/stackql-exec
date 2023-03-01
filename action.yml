@@ -56,7 +56,7 @@ runs:
       with:
         script: |
           const path = require('path');
-          console.log('github action path is ==================', ${{github.action_path}}')
+          console.log('github action path is ==================', ${{github.action_path}})
           const utilsPath = path.join('${{github.action_path}}', 'lib', 'utils.js')
           const {setupAuth} = require(utilsPath)
           setupAuth(core)

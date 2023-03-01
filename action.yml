@@ -55,7 +55,7 @@ runs:
       uses: actions/github-script@v6
       with:
         script: |
-          const {setupAuth} = require('${{github.action_path}}/lib/utils.js')
+          const {setupAuth} = require('${{github.action_path}}lib/utils.js')
           setupAuth(core)
       env:
         AUTH_FILE_PATH: ${{ inputs.auth_obj_path }}
@@ -65,7 +65,7 @@ runs:
       uses: actions/github-script@v6
       with:
         script: |
-          const {getStackqlCommand} = require('${{github.action_path}}/lib/utils.js')
+          const {getStackqlCommand} = require('${{github.action_path}}lib/utils.js')
           getStackqlCommand(core)
       env:
         QUERY_FILE_PATH: ${{ inputs.query_file_path }}

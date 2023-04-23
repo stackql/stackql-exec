@@ -68,6 +68,7 @@ runs:
       with:
         script: |
           const path = require('path');
+          console.log('STACKQL_GITHUB_CREDS', process.env.STACKQL_GITHUB_CREDS)
           const utilsPath = path.join(process.env.GITHUB_ACTION_PATH, 'lib', 'utils.js')
           const {getStackqlCommand} = require(utilsPath)
           getStackqlCommand(core)

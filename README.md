@@ -5,6 +5,11 @@ Github Action as a wrapper for executing a single command in stackql, maps all s
 
 ## AUTH
 
+### Use Environment Variables
+- You can use [Github Secrets](https://docs.github.com/en/actions/reference/encrypted-secrets) to store the value of the environment variable, and use env to pass it to the action. For example:
+
+
+
 `Example auth string`
 ```
 {   "google": { "type": "service_account",  "credentialsfilepath": "sa-key.json" },

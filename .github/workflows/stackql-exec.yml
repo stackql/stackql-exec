@@ -20,9 +20,10 @@ jobs:
     - name: exec google example with query file
       id: stackql-exec-file
       uses: ./
+      with:
+        query_file_path: './stackql_scripts/google-example.iql'
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDS }}
-        query_file_path: './stackql_scripts/google-example.iql'
 
     - name: exec github example with query string
       id: stackql-exec-string

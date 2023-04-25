@@ -17,19 +17,20 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    # - name: exec google example with query file
-    #   id: stackql-exec-file
-    #   uses: ./
-    #   with:
-    #     query_file_path: './stackql_scripts/google-example.iql'
-    #   env:
-    #     GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDS }}
+    - name: exec google example with query file
+      id: stackql-exec-file
+      uses: ./
+      with:
+        query_file_path: './stackql_scripts/google-example.iql'
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDS }}
 
-    - name: exec github example with query string
+    - name: exec github example with query string, use auth string to override
       id: stackql-exec-string
       uses: ./
       with:
-        query: "REGISTRY PULL github v23.01.00104;
+        auth_str: '{ "github": { "type": "basic", "credentialsenvvar": "STACKQL_GITHUB_CREDS" } }'
+        query: "REGISTRY PULL github;
                 SHOW PROVIDERS;
                 select total_private_repos
                 from github.orgs.orgs

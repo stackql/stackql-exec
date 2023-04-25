@@ -1,4 +1,4 @@
-REGISTRY PULL github v23.01.00104;
+REGISTRY PULL github;
 SHOW PROVIDERS;
 select total_private_repos
 from github.orgs.orgs

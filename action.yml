@@ -2,12 +2,6 @@ name: 'StackQL Studios - StackQL Exec'
 description: 'A wrapper for executing a single command, maps all stackql exec args to actions args (supplied using with.)'
 author: 'Yuncheng Yang, StackQL Studios'
 inputs:
-  auth_obj_path:
-    description: file path to json object of stackql auth
-    required: false
-  auth_str:
-    description: json string of stackql auth
-    required: false
   query:
     description: stackql query to be executed
     required: false
@@ -18,6 +12,12 @@ inputs:
     description: output format
     default: 'json'
     required: false
+  data:
+    description: json or jsonnet data used to render a templated stackql query to supply runtime query parameters
+    required: false
+  data_file_path:
+    description: json or jsonnet file used to render a templated stackql query to supply runtime query parameters
+    required: false    
 outputs:
   exec-result:
     description: "stdout of stackql command"
@@ -40,7 +40,7 @@ runs:
         fi
 
     - name: Setup StackQL
-      uses: stackql/setup-stackql@v1.1.0-beta
+      uses: stackql/setup-stackql@v1.2.0
       if: ${{steps.check-stackql.outputs.stackql_installed == 'false'}}
       with:
         use_wrapper: true

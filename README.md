@@ -1,92 +1,78 @@
+[![StackQL Exec](https://github.com/stackql/stackql-exec/actions/workflows/stackql-exec.yml/badge.svg)](https://github.com/stackql/stackql-exec/actions/workflows/stackql-exec.yml)  
+
 # stackql-exec
-Github Action as a wrapper for executing a single command in stackql, maps all stackql exec args to actions args
 
-# Usage
+The `stackql/stackql-exec` action allows you to execute one or more [`stackql`](https://github.com/stackql/stackql) queries or statements in a GitHub Actions workflow.  
 
-## AUTH
+This action can be run on `ubuntu-latest`, `windows-latest`, and `macos-latest` GitHub Actions runners, and will install and expose the latest version of the `stackql` CLI on the runner environment.
 
-`Example auth string`
-```
-{   "google": { "type": "service_account",  "credentialsfilepath": "sa-key.json" },
-    "github": { "type": "basic", "credentialsenvvar": "STACKQL_GITHUB_CREDS" }}
-```
-It can be passed with `auth_str` as a string, or stored in a file and pass filename to `auth-obj-path`
-- For "basic" auth, you need to set a environment variable with same name as the value of `credentialsenvvar` in the auth string for the Github Action step. You can use [Github Secrets](https://docs.github.com/en/actions/reference/encrypted-secrets) to store the value of the environment variable, and use env to pass it to the action. For example:
-```
-env:
-  STACKQL_GITHUB_CREDS: ${{ secrets.STACKQL_GITHUB_CREDS }}
-```
-- For "service_account" auth, you need to store the credentials into a file; You can follow the example of `Prep Google Creds (bash)` step in the example
+## Usage
+Authentication to StackQL providers is done via environment variables source from GitHub Actions Secrets.  To learn more about authentication, see the setup instructions for your provider or providers at the [StackQL Provider Registry Docs](https://stackql.io/registry).
 
-# Examples
-## Basic Example
+## Examples
+The following example demonstrate the use of the `stackql/stackql-exec` action in a GitHub Actions workflow, demonstrating how to use the action to execute a StackQL query directly or run one or more queries from a query file in your repo, including the use of templating to supply runtime parameters to your queries.
+
+### Execute a `stackql` query directly
+The following example uses the GitHub provider for StackQL, for more information on this provider, see the [GitHub provider docs](https://registry.stackql.io/github).
+
 ```
     - name: exec github example
-      uses: ./
+      uses: stackql/stackql-exec@v1.2.0
       with:
-        auth_str: '{ "github": { "type": "basic", "credentialsenvvar": "STACKQL_GITHUB_CREDS" } }'
-        query: "REGISTRY PULL github v23.01.00104;
-                SHOW PROVIDERS;
+        query: "REGISTRY PULL github;
                 select total_private_repos
                 from github.orgs.orgs
                 where org = 'stackql';"
       env: 
-        STACKQL_GITHUB_CREDS: ${{ secrets.STACKQL_GITHUB_CREDS }}
-
+        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
+        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
 ```
 
+### Execute a rendered `stackql` query directly using parameters
+The following example uses the AWS and Google providers for StackQL, for more information on these providers, see the [AWS provider docs](https://registry.stackql.io/github) and [Google provider docs](https://registry.stackql.io/google).  For more information on providing parameters to queries, see the [StackQL docs]
 
-## Auth json file and query file example
-- `auth.json`
-```
-{   "google": { "type": "service_account",  "credentialsfilepath": "sa-key.json" },
-    "github": { "type": "basic", "credentialsenvvar": "STACKQL_GITHUB_CREDS" }}
-```
-- `google-example.iql`
-```
-REGISTRY PULL github v23.01.00104;
-SHOW PROVIDERS;
-select total_private_repos
-from github.orgs.orgs
-where org = 'stackql';
-```
-**Example**
-```
-    - name: Prep Google Creds (Windows)
-      if: ${{ matrix.os == 'windows-latest'}}
-      run: | ## use the secret to create json file
-        $GoogleCreds = [System.Environment]::GetEnvironmentVariable("GOOGLE_CREDS_ENV")
-        $GoogleCredsDecoded = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($GoogleCreds))
-        Write-Output $GoogleCredsDecoded | Set-Content sa-key.json
-      shell: pwsh
-      env:
-        GOOGLE_CREDS_ENV: ${{ secrets.GOOGLE_CREDS }}
-  
-    - name: Prep Google Creds (bash)
-      if: ${{ matrix.os != 'windows-latest' }}
-      shell: bash
-      run: | ## use the base64 encoded secret to create json file
-        sudo echo ${{ secrets.GOOGLE_CREDS }} | base64 -d > sa-key.json
 
-    - name: exec google example
-      uses: ./
+```
+    - name: multi cloud select with parameters
+      uses: stackql/stackql-exec@v1.2.0
       with:
-        auth_obj_path: './stackql_scripts/auth.json'
-        query_file_path: './stackql_scripts/google-example.iql'
+        query: "REGISTRY PULL aws;
+                REGISTRY PULL google;
+                select total_private_repos
+                from github.orgs.orgs
+                where org = 'stackql';"
+        data:
+          syndey:
+            aws:
+              region: ap-southeast-2
+            google:
+              region: australia-southeast1
+              project: stackql 
+      env: 
+        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
+        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
 ```
+
+
+
+
+### Execute `stackql` queries from a file
+
+
+### Execute `stackql` queries from a file using parameters
+
+
 
 
 ## Inputs
-- `auth_obj_path` - (optional) the path of json file that stores stackql AUTH string
-- `auth_str` - (optional) stackql AUTH string, need either auth_str or auth_obj_path
-- `query` - (optional) stackql query to execute
-- `query_file_path` - (optional) stackql query file to execute, need either query or query_file_path
-- `query_output` - (optional) output format of the stackql exec result, accept "table", "csv", "json", default to "json"
-
+- `query` - (optional) `stackql` query to execute
+- `query_file_path` - (optional) `stackql` query file to execute (need to supply either `query` or `query_file_path`)
+- `query_output` - (optional) output format of the `stackql exec` result, accepts `table`, `csv`, `json`, defaults to `json`
+- `data` - (optional) object used to render a templated `stackql` query to supply runtime query parameters
+- `data_file_path` - (optional) path to a `json` or `jsonnet` file used to render a templated `stackql` query to supply runtime query parameters (ignored if `data` action input argument is supplied)
 
 ## Outputs
-This action uses [setup-stackql](https://github.com/marketplace/actions/stackql-studio-setup-stackql), with use_wrapper set
-to `true`, `stdout` and `stderr` are set to `exec-result` and `exec-error`
+This action uses [setup-stackql](https://github.com/marketplace/actions/stackql-studio-setup-stackql), with `use_wrapper` set to `true`, `stdout` and `stderr` are set to `exec-result` and `exec-error`
 
 - `exec-result` - The STDOUT stream of the call to the `stackql` binary.
 - `exec-error` - The STDERR stream of the call to the `stackql` binary.

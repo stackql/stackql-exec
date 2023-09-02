@@ -9,7 +9,7 @@ inputs:
     description: stackql query file to be executed
     required: false
   vars:
-    description: stackql vars to be passed to query
+    description: comma delimited list of vars to be passed to query preprocessor (jsonnet)
     required: false
   query_output:
     description: output format

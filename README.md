@@ -44,18 +44,17 @@ GROUP BY status;
       uses: ./
       with:
         query_file_path: './stackql_scripts/google-example.iql'
-        vars: 
-        - GOOGLE_PROJECT=$GOOGLE_PROJECT
+        vars: GOOGLE_PROJECT=$GOOGLE_PROJECT, GOOGLE_ZONE=$GOOGLE_ZONE
       env: 
-        GOOGLE_CREDENTIALS: ${{  secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         GOOGLE_PROJECT: ${{  secrets.GOOGLE_PROJECT }}
+        GOOGLE_ZONE: ${{  secrets.GOOGLE_ZONE }}
 ```
-
 
 ## Inputs
 - `query` - stackql query to execute **(need to supply either `query` or `query_file_path`)**
 - `query_file_path` - stackql query file to execute **(need to supply either `query` or `query_file_path`)**
-- `vars` - (optional) list of variables to pass to the query file, accepts `var1=val1 var2=val2`, can be used to source environment variables into stackql queries 
+- `vars` - (optional) comma delimited list of variables to pass to the stackql query preprocessor (jsonnet), accepts `var1=val1 var2=val2`, can be used to source environment variables into stackql queries 
 - `query_output` - (optional) output format of the stackql exec result, accepts `table`, `csv`, `json`, defaults to `json`
 - `auth_obj_path` - (optional) the path of json file that stores stackql AUTH string **(only required when using non-standard environment variable names)**
 - `auth_str` - (optional) stackql AUTH string **(only required when using non-standard environment variable names)**

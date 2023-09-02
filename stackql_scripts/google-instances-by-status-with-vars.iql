@@ -1,0 +1,12 @@
+<<<jsonnet
+local project = std.extVar("GOOGLE_PROJECT");
+local zone = std.extVar("GOOGLE_ZONE");
+{
+   project: project,
+   zone: zone,
+}
+>>>
+SELECT status, count(*) as num_instances
+FROM google.compute.instances
+WHERE project = '{{ .project }}' and zone = '{{ .zone }}'
+GROUP BY status;

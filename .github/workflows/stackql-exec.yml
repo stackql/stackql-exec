@@ -53,18 +53,33 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     #
-    # query_file_path with vars
+    # query_file_path with jsonnet code block using external vars
     #
     - name: exec google example with query file using vars
       id: stackql-exec-file-with-vars
       uses: ./
       with:
-        query_file_path: './stackql_scripts/google-instances-by-status-with-vars.iql'
+        query_file_path: './stackql_scripts/google-instances-by-status-with-inline-jsonnet-block.iql'
         vars: GOOGLE_PROJECT=${{ env.GOOGLE_PROJECT }},GOOGLE_ZONE=${{ env.GOOGLE_ZONE }}
       env: 
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         GOOGLE_PROJECT: ${{ vars.GOOGLE_PROJECT }}
         GOOGLE_ZONE: ${{ vars.GOOGLE_ZONE }}
+
+    #
+    # query_file_path with jsonnet data file using external vars
+    #
+    - name: exec google example with query file and data file using vars
+      id: stackql-exec-file-with-data-file-and-vars
+      uses: ./
+      with:
+        query_file_path: './stackql_scripts/google-instances-by-status-with-external-data-file.iql'
+        data_file_path: './stackql_scripts/google-instances-by-status-with-external-data-file.jsonnet'
+        vars: GOOGLE_PROJECT=${{ env.GOOGLE_PROJECT }},GOOGLE_ZONE=${{ env.GOOGLE_ZONE }}
+      env: 
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_PROJECT: ${{ vars.GOOGLE_PROJECT }}
+        GOOGLE_ZONE: ${{ vars.GOOGLE_ZONE }}        
 
     - name: validate stackql-exec output
       shell: bash
@@ -82,6 +97,10 @@ jobs:
           exit 1
         fi
         if [ -z '${{ steps.stackql-exec-file-with-vars.outputs.exec-result }}' ]; then
+          echo "exec-stackql output does not contain expected result"
+          exit 1
+        fi
+        if [ -z '${{ steps.stackql-exec-file-with-data-file-and-vars.outputs.exec-result }}' ]; then
           echo "exec-stackql output does not contain expected result"
           exit 1
         fi

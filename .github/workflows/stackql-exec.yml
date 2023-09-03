@@ -55,7 +55,7 @@ jobs:
     #
     # query_file_path with vars
     #
-    - name: exec google example with query file
+    - name: exec google example with query file using vars
       id: stackql-exec-file-with-vars
       uses: ./
       with:

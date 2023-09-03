@@ -2,21 +2,24 @@ name: 'StackQL Studios - StackQL Exec'
 description: 'A wrapper for executing a single command, maps all stackql exec args to actions args (supplied using with.)'
 author: 'Yuncheng Yang, StackQL Studios'
 inputs:
-  auth_obj_path:
-    description: file path to json object of stackql auth
-    required: false
-  auth_str:
-    description: json string of stackql auth
-    required: false
   query:
     description: stackql query to be executed
     required: false
   query_file_path:
     description: stackql query file to be executed
     required: false
+  vars:
+    description: comma delimited list of vars to be passed to query preprocessor (jsonnet)
+    required: false
   query_output:
     description: output format
     default: 'json'
+    required: false
+  auth_obj_path:
+    description: file path to json object of stackql auth, not required if using standard provider authentication environment variables
+    required: false
+  auth_str:
+    description: json string of stackql auth, not required if using standard provider authentication environment variables  
     required: false
 outputs:
   exec-result:
@@ -40,7 +43,7 @@ runs:
         fi
 
     - name: Setup StackQL
-      uses: stackql/setup-stackql@v1.1.0-beta
+      uses: stackql/setup-stackql@v1.2.0
       if: ${{steps.check-stackql.outputs.stackql_installed == 'false'}}
       with:
         use_wrapper: true
@@ -75,6 +78,7 @@ runs:
         QUERY_FILE_PATH: ${{ inputs.query_file_path }}
         QUERY: ${{inputs.query}}
         OUTPUT: ${{inputs.query_output}}
+        VARS: ${{inputs.vars}}
     
     - name: execute stackql command
       id: exec-stackql

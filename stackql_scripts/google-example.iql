@@ -1,4 +1,0 @@
-REGISTRY PULL google v23.01.00116;
-SELECT name, status
-FROM google.compute.instances 
-WHERE project = 'stackql-demo' AND zone = 'australia-southeast1-a';

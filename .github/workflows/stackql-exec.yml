@@ -63,8 +63,8 @@ jobs:
         vars: GOOGLE_PROJECT=${GOOGLE_PROJECT}, GOOGLE_ZONE=${GOOGLE_ZONE}
       env: 
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        GOOGLE_PROJECT: ${{ vars.GOOGLE_PROJECT }}
-        GOOGLE_ZONE: ${{ vars.GOOGLE_ZONE }}
+        GOOGLE_PROJECT: ${{ env.GOOGLE_PROJECT }}
+        GOOGLE_ZONE: ${{ env.GOOGLE_ZONE }}
 
     - name: validate stackql-exec output
       shell: bash

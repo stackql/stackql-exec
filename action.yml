@@ -8,8 +8,11 @@ inputs:
   query_file_path:
     description: stackql query file to be executed
     required: false
+  data_file_path:
+    description: jsonnet or json data file to be passed to query preprocessor
+    required: false
   vars:
-    description: comma delimited list of vars to be passed to query preprocessor (jsonnet)
+    description: comma delimited list of vars to be passed to query preprocessor (supported with jsonnet config blocks or jsonnet data files only)
     required: false
   query_output:
     description: output format
@@ -77,6 +80,7 @@ runs:
       env:
         QUERY_FILE_PATH: ${{ inputs.query_file_path }}
         QUERY: ${{inputs.query}}
+        DATA_FILE_PATH: ${{inputs.data_file_path}}
         OUTPUT: ${{inputs.query_output}}
         VARS: ${{inputs.vars}}
     

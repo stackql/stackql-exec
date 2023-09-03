@@ -56,7 +56,8 @@ GROUP BY status;
 ## Inputs
 - `query` - stackql query to execute **(need to supply either `query` or `query_file_path`)**
 - `query_file_path` - stackql query file to execute **(need to supply either `query` or `query_file_path`)**
-- `vars` - (optional) comma delimited list of variables to pass to the stackql query preprocessor (jsonnet), accepts `var1=val1 var2=val2`, can be used to source environment variables into stackql queries 
+- `data_file_path` - (optional) path to data file to pass to the stackql query preprocessor (`json` or `jsonnet`)
+- `vars` - (optional) comma delimited list of variables to pass to the stackql query preprocessor (supported with `jsonnet` config blocks or `jsonnet` data files only), accepts `var1=val1,var2=val2`, can be used to source environment variables into stackql queries 
 - `query_output` - (optional) output format of the stackql exec result, accepts `table`, `csv`, `json`, defaults to `json`
 - `auth_obj_path` - (optional) the path of json file that stores stackql AUTH string **(only required when using non-standard environment variable names)**
 - `auth_str` - (optional) stackql AUTH string **(only required when using non-standard environment variable names)**

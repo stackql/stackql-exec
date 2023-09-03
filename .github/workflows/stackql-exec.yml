@@ -60,11 +60,11 @@ jobs:
       uses: ./
       with:
         query_file_path: './stackql_scripts/google-instances-by-status-with-vars.iql'
-        vars: GOOGLE_PROJECT=${GOOGLE_PROJECT}, GOOGLE_ZONE=${GOOGLE_ZONE}
+        vars: GOOGLE_PROJECT=${{ env.GOOGLE_PROJECT }}, GOOGLE_ZONE=${{ env.GOOGLE_ZONE }}
       env: 
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        GOOGLE_PROJECT: ${{ env.GOOGLE_PROJECT }}
-        GOOGLE_ZONE: ${{ env.GOOGLE_ZONE }}
+        GOOGLE_PROJECT: ${{ vars.GOOGLE_PROJECT }}
+        GOOGLE_ZONE: ${{ vars.GOOGLE_ZONE }}
 
     - name: validate stackql-exec output
       shell: bash

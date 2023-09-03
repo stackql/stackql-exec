@@ -28,27 +28,29 @@ Authentication to StackQL providers is done via environment variables source fro
 ```
 <<<jsonnet
 local project = std.extVar("GOOGLE_PROJECT");
+local zone = std.extVar("GOOGLE_ZONE");
 {
    project: project,
+   zone: zone,
 }
 >>>
-REGISTRY PULL google;
 SELECT status, count(*) as num_instances
 FROM google.compute.instances
-WHERE project = '{{ .project }}'
+WHERE project = '{{ .project }}' and zone = '{{ .zone }}'
 GROUP BY status;
 ```
 **Example**
 ```
-    - name: exec google example
+    - name: exec google example with query file using vars
+      id: stackql-exec-file-with-vars
       uses: ./
       with:
         query_file_path: './stackql_scripts/google-example.iql'
-        vars: GOOGLE_PROJECT=$GOOGLE_PROJECT, GOOGLE_ZONE=$GOOGLE_ZONE
+        vars: GOOGLE_PROJECT=${{ env.GOOGLE_PROJECT }},GOOGLE_ZONE=${{ env.GOOGLE_ZONE }}
       env: 
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        GOOGLE_PROJECT: ${{  secrets.GOOGLE_PROJECT }}
-        GOOGLE_ZONE: ${{  secrets.GOOGLE_ZONE }}
+        GOOGLE_PROJECT: ${{ vars.GOOGLE_PROJECT }}
+        GOOGLE_ZONE: ${{ vars.GOOGLE_ZONE }}
 ```
 
 ## Inputs

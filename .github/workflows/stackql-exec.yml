@@ -18,7 +18,7 @@ jobs:
       uses: actions/checkout@v4.1.3
 
     #
-    # run a command (does not return data)
+    # run a query that does not return data (using the `is_command` input)
     #
     - name: pull providers
       id: stackql-command
@@ -35,9 +35,11 @@ jobs:
       id: stackql-query
       uses: ./
       with:
-        query: "select total_private_repos
-                from github.orgs.orgs
-                where org = 'stackql';"
+        query: |
+          select visibility, count(*) as number_of_repos
+          from github.repos.repos
+          where org = 'stackql'
+          group by visibility
       env: 
         STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
         STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
@@ -46,7 +48,7 @@ jobs:
     # run a query using the `query_file_path` input
     #
     - name: google query example with query file
-      id: stackql-query-file-path
+      id: stackql-query-file
       uses: ./
       with:
         query_file_path: './stackql_scripts/google-instances-by-status.iql'
@@ -57,7 +59,7 @@ jobs:
     # run a query using the `query_file_path` and `vars` inputs
     #
     - name: google query example with query file using vars
-      id: stackql-query-file-path-with-vars
+      id: stackql-query-file-with-vars
       uses: ./
       with:
         query_file_path: './stackql_scripts/google-instances-by-status-with-inline-jsonnet-block.iql'
@@ -105,14 +107,14 @@ jobs:
           exit 1
         fi
 
-        # validate google query example with query file (stackql-query-file-path)
-        if [ -z '${{ steps.stackql-query-file-path.outputs.exec-result }}' ]; then
+        # validate google query example with query file (stackql-query-file)
+        if [ -z '${{ steps.stackql-query-file.outputs.exec-result }}' ]; then
           echo "exec-stackql output does not contain expected result"
           exit 1
         fi
 
-        # validate google query example with query file using vars (stackql-query-file-path-with-vars)
-        if [ -z '${{ steps.stackql-query-file-path-with-vars.outputs.exec-result }}' ]; then
+        # validate google query example with query file using vars (stackql-query-file-with-vars)
+        if [ -z '${{ steps.stackql-query-file-with-vars.outputs.exec-result }}' ]; then
           echo "exec-stackql output does not contain expected result"
           exit 1
         fi

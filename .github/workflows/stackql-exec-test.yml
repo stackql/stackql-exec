@@ -32,6 +32,18 @@ jobs:
     # run a query using the `query` input
     #
     - name: github query example using the query input
+      id: stackql-query-test
+      uses: ./
+      with:
+        query: "select visibility, count(*) as number_of_repos from github.repos.repos where org = 'stackql' group by visibility"
+      env: 
+        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
+        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
+
+    #
+    # run a query using the `query` input
+    #
+    - name: github query example using the query input
       id: stackql-query
       uses: ./
       with:

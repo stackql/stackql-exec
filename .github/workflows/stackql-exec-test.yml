@@ -44,6 +44,51 @@ jobs:
         STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
         STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
 
+    # `csv` output
+    - name: github query example using the query input (csv output)
+      id: stackql-query-csv-output
+      uses: ./
+      with:
+        query_output: csv
+        query: |
+          select visibility, count(*) as number_of_repos
+          from github.repos.repos
+          where org = 'stackql'
+          group by visibility
+      env: 
+        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
+        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
+
+    # `table` output
+    - name: github query example using the query input (table output)
+      id: stackql-query-table-output
+      uses: ./
+      with:
+        query_output: table
+        query: |
+          select visibility, count(*) as number_of_repos
+          from github.repos.repos
+          where org = 'stackql'
+          group by visibility
+      env: 
+        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
+        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
+
+    # `text` output
+    - name: github query example using the query input (text output)
+      id: stackql-query-text-output
+      uses: ./
+      with:
+        query_output: text
+        query: |
+          select visibility, count(*) as number_of_repos
+          from github.repos.repos
+          where org = 'stackql'
+          group by visibility
+      env: 
+        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
+        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
+
     #
     # run a query using the `query_file_path` input
     #

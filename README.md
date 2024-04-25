@@ -14,7 +14,7 @@ Authentication to StackQL providers is done via environment variables source fro
 - `query_output` - (optional) output format of the stackql exec result, accepts `table`, `csv`, `json`, defaults to `json`
 - `auth_obj_path` - (optional) the path of json file that stores stackql AUTH string **(only required when using non-standard environment variable names)**
 - `auth_str` - (optional) stackql AUTH string **(only required when using non-standard environment variable names)**
-
+- `is_command` - (optional defaults to 'false') set to true if the stackql execution is a command that does not return data
 
 ## Outputs
 This action uses [setup-stackql](https://github.com/marketplace/actions/stackql-studio-setup-stackql), with use_wrapper set
@@ -27,15 +27,29 @@ to `true`, `stdout` and `stderr` are set to `exec-result` and `exec-error`
 
 ### Inline `stackql` query example
 
+this is an example of a command (that does not return data):
+
 ```yaml
     - name: exec github example
       uses: ./
       with:
+        is_command: 'true'
         query: "REGISTRY PULL github;
-                SHOW PROVIDERS;
-                select total_private_repos
-                from github.orgs.orgs
-                where org = 'stackql';"
+      env: 
+        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
+        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
+```
+
+this is an example of a query that returns data:
+
+```yaml
+    - name: exec github example
+      uses: ./
+      with:
+        query: |
+          select total_private_repos
+          from github.orgs.orgs
+          where org = 'stackql'"
       env: 
         STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
         STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}

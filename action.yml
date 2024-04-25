@@ -24,6 +24,10 @@ inputs:
   auth_str:
     description: json string of stackql auth, not required if using standard provider authentication environment variables  
     required: false
+  is_command:
+    description: "Set to true if the stackql execution is a command that does not return data"
+    required: false
+    default: 'false'
 outputs:
   exec-result:
     description: "stdout of stackql command"
@@ -31,7 +35,6 @@ outputs:
   exec-error:
     description: "stderr of stackql command"
     value: ${{ steps.exec-stackql.outputs.stderr }}
-
 runs:
   using: "composite"
   steps:
@@ -85,10 +88,33 @@ runs:
         VARS: ${{inputs.vars}}
     
     - name: execute stackql command
+      uses: actions/github-script@v6
       id: exec-stackql
-      shell: bash
-      run: |
-        ${{ env.STACKQL_COMMAND }}
+      with:
+        script: |
+          const path = require('path');
+          const utilsPath = path.join(process.env.GITHUB_ACTION_PATH, 'lib', 'utils.js')
+          const {execStackQLQuery} = require(utilsPath)
+          execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true' ? true : false)
+
+    # - name: execute stackql command
+    #   id: exec-stackql
+    #   shell: bash
+    #   run: |
+    #     if [ "${{ inputs.is_command }}" == "true" ]; then
+    #       set +e  # Ignore errors to prevent the workflow from failing
+    #     fi
+    #     OUTPUT=$({{ env.STACKQL_COMMAND }} 2>&1)
+    #     EXIT_CODE=$?
+    #     echo "::set-output name=stdout::$OUTPUT"
+    #     if [ $EXIT_CODE -ne 0 ] && [ "${{ inputs.is_command }}" == "false" ]; then
+    #       echo "::set-output name=stderr::$OUTPUT"
+    #       echo "::error::StackQL command failed with exit code $EXIT_CODE"
+    #     fi
+    #     if [ "${{ inputs.is_command }}" == "true" ]; then
+    #       set -e  # Re-enable error checking
+    #       echo "$OUTPUT"  # Just print the output, including errors
+    #     fi
       
 branding:
   icon: 'terminal'

@@ -7,11 +7,11 @@ jobs:
     runs-on: ubuntu-latest
       
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4.1.3
       - name: Use Node.js 16
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: 16.x
       - run: npm ci
       - run: npm test
-        
+            

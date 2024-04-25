@@ -97,7 +97,9 @@ runs:
           const {execStackQLQuery} = require(utilsPath)
           console.log(process.env.IS_COMMAND) 
           execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true' ? true : false)
-      
+      env:
+          IS_COMMAND: ${{inputs.is_command}}
+
 branding:
   icon: 'terminal'
   color: 'green'

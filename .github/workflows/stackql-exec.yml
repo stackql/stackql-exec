@@ -21,7 +21,7 @@ jobs:
     # pull providers (command example)
     #
     - name: pull providers
-      id: stackql-exec-string-noauth
+      id: pull-providers-command
       uses: ./
       with:
         is_command: true
@@ -85,10 +85,17 @@ jobs:
     - name: validate stackql-exec output
       shell: bash
       run: |
-        if [ -z '${{ steps.stackql-exec-string-noauth.outputs.exec-result }}' ]; then
-          echo "exec-stackql output does not contain expected result"
-          exit 1
-        fi
+        # Get the output of the pull providers command
+        output="${{ steps.pull-providers-command.outputs.exec-result }}"
+        regex="([a-zA-Z]+) provider, version 'v[0-9.]+' successfully installed"
+        echo "$output" | while read -r line; do
+          if ! echo "$line" | grep -qE "$regex"; then
+            echo "failed line: $line"
+            exit 1
+          fi
+          echo "line: $line"
+        done
+
         if [ -z '${{ steps.stackql-exec-string.outputs.exec-result }}' ]; then
           echo "exec-stackql output does not contain expected result"
           exit 1

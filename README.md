@@ -11,7 +11,7 @@ Authentication to StackQL providers is done via environment variables source fro
 - `query_file_path` - stackql query file to execute **(need to supply either `query` or `query_file_path`)**
 - `data_file_path` - (optional) path to data file to pass to the stackql query preprocessor (`json` or `jsonnet`)
 - `vars` - (optional) comma delimited list of variables to pass to the stackql query preprocessor (supported with `jsonnet` config blocks or `jsonnet` data files only), accepts `var1=val1,var2=val2`, can be used to source environment variables into stackql queries 
-- `query_output` - (optional) output format of the stackql exec result, accepts `table`, `csv`, `json`, defaults to `json`
+- `query_output` - (optional) output format of the stackql exec result, accepts `table`, `csv`, `json` and `text`, defaults to `json`
 - `auth_obj_path` - (optional) the path of json file that stores stackql AUTH string **(only required when using non-standard environment variable names)**
 - `auth_str` - (optional) stackql AUTH string **(only required when using non-standard environment variable names)**
 - `is_command` - (optional defaults to 'false') set to true if the stackql execution is a command that does not return data

@@ -24,6 +24,7 @@ jobs:
       id: stackql-exec-string-noauth
       uses: ./
       with:
+        is_command: true
         query: "REGISTRY PULL github;
                 REGISTRY PULL google;"
 

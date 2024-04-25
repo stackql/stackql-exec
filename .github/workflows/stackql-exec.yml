@@ -93,12 +93,10 @@ jobs:
           if [[ -z "$line" ]]; then
             continue
           fi
-          # Apply regex to non-empty lines
           if ! echo "$line" | grep -qE "$regex"; then
             echo "failed line: $line"
             exit 1
           fi
-          echo "line: $line"
         done
 
         if [ -z '${{ steps.stackql-exec-string.outputs.exec-result }}' ]; then

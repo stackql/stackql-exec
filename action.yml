@@ -95,7 +95,6 @@ runs:
           const path = require('path');
           const utilsPath = path.join(process.env.GITHUB_ACTION_PATH, 'lib', 'utils.js')
           const {execStackQLQuery} = require(utilsPath)
-          console.log(process.env.IS_COMMAND) 
           execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true' ? true : false)
       env:
           IS_COMMAND: ${{inputs.is_command}}

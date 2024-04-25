@@ -88,7 +88,12 @@ jobs:
         # Get the output of the pull providers command
         output="${{ steps.pull-providers-command.outputs.exec-result }}"
         regex="([a-zA-Z]+) provider, version 'v[0-9.]+' successfully installed"
-        echo "$output" | while read -r line; do
+        echo "$output" | while IFS= read -r line; do
+          # Skip empty lines
+          if [[ -z "$line" ]]; then
+            continue
+          fi
+          # Apply regex to non-empty lines
           if ! echo "$line" | grep -qE "$regex"; then
             echo "failed line: $line"
             exit 1

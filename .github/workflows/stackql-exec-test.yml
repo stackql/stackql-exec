@@ -29,6 +29,16 @@ jobs:
                 REGISTRY PULL google;"
 
     #
+    # run a query that does not return data (using the `is_command` input)
+    #
+    - name: pull providers
+      id: stackql-command-bad
+      uses: ./
+      with:
+        is_command: true
+        query: "BSOMMAND"
+
+    #
     # run a query using the `query` input
     #
     - name: github query example using the query input

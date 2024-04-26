@@ -15,7 +15,7 @@ inputs:
     description: comma delimited list of vars to be passed to query preprocessor (supported with jsonnet config blocks or jsonnet data files only)
     required: false
   query_output:
-    description: output format
+    description: output format for queries (ignored is `is_command` is `true`), supported formats include `json` (default), `csv`, `table` and `text`
     default: 'json'
     required: false
   auth_obj_path:
@@ -24,14 +24,24 @@ inputs:
   auth_str:
     description: json string of stackql auth, not required if using standard provider authentication environment variables  
     required: false
+  is_command:
+    description: "Set to true if the stackql execution is a command that does not return data"
+    required: false
+    default: 'false'
+  on_failure:
+    description: behavior on a failure in query, supported values are `exit` (default) and `continue`
+    required: false
+    default: 'exit'
 outputs:
-  exec-result:
-    description: "stdout of stackql command"
-    value: ${{ steps.exec-stackql.outputs.stdout }}
-  exec-error:
-    description: "stderr of stackql command"
-    value: ${{ steps.exec-stackql.outputs.stderr }}
-
+  stackql-query-results:
+    description: results from a stackql query (in the format specified)
+    value: ${{ steps.exec-stackql.outputs.stackql-query-results }}
+  stackql-command-output:
+    description: text output from a stackql command (a query that does not return data)
+    value: ${{ steps.exec-stackql.outputs.stackql-command-output }}	
+  stackql-query-error:
+    description: error from a stackql query
+    value: ${{ steps.exec-stackql.outputs.stackql-query-error }}
 runs:
   using: "composite"
   steps:
@@ -46,7 +56,7 @@ runs:
         fi
 
     - name: Setup StackQL
-      uses: stackql/setup-stackql@v1.2.0
+      uses: stackql/setup-stackql@v2.1.0
       if: ${{steps.check-stackql.outputs.stackql_installed == 'false'}}
       with:
         use_wrapper: true
@@ -58,7 +68,7 @@ runs:
 
     - name: Setup auth
       id: setup-auth
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7.0.1
       with:
         script: |
           const path = require('path');
@@ -70,7 +80,7 @@ runs:
         AUTH_STR: ${{inputs.auth_str}}
 
     - name: get stackql command
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7.0.1
       with:
         script: |
           const path = require('path');
@@ -85,11 +95,19 @@ runs:
         VARS: ${{inputs.vars}}
     
     - name: execute stackql command
+      uses: actions/github-script@v7.0.1
       id: exec-stackql
-      shell: bash
-      run: |
-        ${{ env.STACKQL_COMMAND }}
-      
+      with:
+        script: |
+          const path = require('path');
+          const utilsPath = path.join(process.env.GITHUB_ACTION_PATH, 'lib', 'utils.js')
+          const {execStackQLQuery} = require(utilsPath);
+          const onFailure = process.env.ON_FAILURE || 'exit';  // default to 'exit' if not specified
+          await execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true', onFailure);
+      env:
+          IS_COMMAND: ${{ inputs.is_command }}
+          ON_FAILURE: ${{ inputs.on_failure }}          
+
 branding:
   icon: 'terminal'
   color: 'green'

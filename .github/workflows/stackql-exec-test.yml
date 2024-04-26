@@ -1,0 +1,157 @@
+name: 'stackql query tests'
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+jobs:
+  stackql-exec-google-example:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{matrix.os}}
+    name: 'StackQL exec Google '
+
+    steps: 
+    - name: Checkout
+      uses: actions/checkout@v4.1.3
+
+    #
+    # run a query that does not return data (using the `is_command` input)
+    #
+    - name: pull providers
+      id: stackql-command
+      uses: ./
+      with:
+        is_command: true
+        query: "REGISTRY PULL github;
+                REGISTRY PULL google;"
+
+    #
+    # run a query using the `query` input
+    #
+    - name: github query example using the query input
+      id: stackql-query
+      uses: ./
+      with:
+        query: |
+          select visibility, count(*) as number_of_repos
+          from github.repos.repos
+          where org = 'stackql'
+          group by visibility
+      env: 
+        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
+        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
+
+    # `csv` output
+    - name: github query example using the query input (csv output)
+      id: stackql-query-csv-output
+      uses: ./
+      with:
+        query_output: csv
+        query: |
+          select visibility, count(*) as number_of_repos
+          from github.repos.repos
+          where org = 'stackql'
+          group by visibility
+      env: 
+        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
+        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
+
+    # `table` output
+    - name: github query example using the query input (table output)
+      id: stackql-query-table-output
+      uses: ./
+      with:
+        query_output: table
+        query: |
+          select visibility, count(*) as number_of_repos
+          from github.repos.repos
+          where org = 'stackql'
+          group by visibility
+      env: 
+        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
+        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
+
+    # `text` output
+    - name: github query example using the query input (text output)
+      id: stackql-query-text-output
+      uses: ./
+      with:
+        query_output: text
+        query: |
+          select visibility, count(*) as number_of_repos
+          from github.repos.repos
+          where org = 'stackql'
+          group by visibility
+      env: 
+        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
+        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
+
+    #
+    # run a query using the `query_file_path` input
+    #
+    - name: google query example with query file
+      id: stackql-query-file
+      uses: ./
+      with:
+        query_file_path: './stackql_scripts/google-instances-by-status.iql'
+      env: 
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    #
+    # run a query using the `query_file_path` and `vars` inputs
+    #
+    - name: google query example with query file using vars
+      id: stackql-query-file-with-vars
+      uses: ./
+      with:
+        query_file_path: './stackql_scripts/google-instances-by-status-with-inline-jsonnet-block.iql'
+        vars: GOOGLE_PROJECT=${{ env.GOOGLE_PROJECT }},GOOGLE_ZONE=${{ env.GOOGLE_ZONE }}
+      env: 
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_PROJECT: ${{ vars.GOOGLE_PROJECT }}
+        GOOGLE_ZONE: ${{ vars.GOOGLE_ZONE }}
+
+    #
+    # run a query using the `query_file_path`, `data_file_path` and `vars` inputs
+    #
+    - name: google query example with query file and data file using vars
+      id: stackql-query-file-with-data-file-and-vars
+      uses: ./
+      with:
+        query_file_path: './stackql_scripts/google-instances-by-status-with-external-data-file.iql'
+        data_file_path: './stackql_scripts/google-instances-by-status-with-external-data-file.jsonnet'
+        vars: GOOGLE_PROJECT=${{ env.GOOGLE_PROJECT }},GOOGLE_ZONE=${{ env.GOOGLE_ZONE }}
+      env: 
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_PROJECT: ${{ vars.GOOGLE_PROJECT }}
+        GOOGLE_ZONE: ${{ vars.GOOGLE_ZONE }}        
+
+    - name: validate stackql outputs
+      shell: bash
+      run: |
+        echo "stackql-command:"
+        echo "${{ steps.stackql-command.outputs.stackql-command-output }}"
+
+        echo "stackql-query:"
+        echo "${{ steps.stackql-query.outputs.stackql-query-results }}"
+
+        echo "stackql-query-csv-output:"
+        echo "${{ steps.stackql-query-csv-output.outputs.stackql-query-results }}"
+
+        echo "stackql-query-table-output:"
+        echo "${{ steps.stackql-query-table-output.outputs.stackql-query-results }}"
+
+        echo "stackql-query-text-output:"
+        echo "${{ steps.stackql-query-text-output.outputs.stackql-query-results }}"
+
+        echo "stackql-query-file:"
+        echo "${{ steps.stackql-query-file.outputs.stackql-query-results }}"
+
+        echo "stackql-query-file-with-vars:"
+        echo "${{ steps.stackql-query-file-with-vars.outputs.stackql-query-results }}"
+
+        echo "stackql-query-file-with-data-file-and-vars:"
+        echo "${{ steps.stackql-query-file-with-data-file-and-vars.outputs.stackql-query-results }}"

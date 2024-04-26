@@ -87,6 +87,18 @@ runs:
         OUTPUT: ${{inputs.query_output}}
         VARS: ${{inputs.vars}}
     
+    # - name: execute stackql command
+    #   uses: actions/github-script@v7.0.1
+    #   id: exec-stackql
+    #   with:
+    #     script: |
+    #       const path = require('path');
+    #       const utilsPath = path.join(process.env.GITHUB_ACTION_PATH, 'lib', 'utils.js')
+    #       const {execStackQLQuery} = require(utilsPath)
+    #       execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true' ? true : false)
+    #   env:
+    #       IS_COMMAND: ${{inputs.is_command}}
+
     - name: execute stackql command
       uses: actions/github-script@v7.0.1
       id: exec-stackql
@@ -94,10 +106,11 @@ runs:
         script: |
           const path = require('path');
           const utilsPath = path.join(process.env.GITHUB_ACTION_PATH, 'lib', 'utils.js')
-          const {execStackQLQuery} = require(utilsPath)
-          execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true' ? true : false)
+          const {execStackQLQuery} = require(utilsPath);
+          // Use await here since execStackQLQuery is an async function
+          await execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true');
       env:
-          IS_COMMAND: ${{inputs.is_command}}
+          IS_COMMAND: ${{ inputs.is_command }}
 
 branding:
   icon: 'terminal'

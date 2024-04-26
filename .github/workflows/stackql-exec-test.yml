@@ -1,4 +1,4 @@
-name: 'StackQL Exec Test'
+name: 'stackql query tests'
 
 on:
   push:
@@ -132,63 +132,53 @@ jobs:
     - name: validate stackql outputs
       shell: bash
       run: |
-        # Test `stackql-command`
-        output="${{ steps.stackql-command.outputs.stackql-command-output }}"
-        all_passed=true
-        echo "$output" | while IFS= read -r line; do
-          # Skip empty lines
-          if [[ -z "$line" ]]; then
-            continue
-          fi
-          # Validate against a simple keyword presence
-          if ! echo "$line" | grep -qi "provider" || ! echo "$line" | grep -qi "version" || ! echo "$line" | grep -qi "successfully installed"; then
-            echo "Failed line: $line"
-            all_passed=false
-          fi
-        done
-        if [[ "$all_passed" == "false" ]]; then
-          echo "One or more lines in the output failed to match the expected format."
-          exit 1
+        # Check stackql-command output
+        if echo "${{ steps.stackql-command.outputs.stackql-command-output }}" | grep -qE "provider, version 'v[0-9.]+' successfully installed"; then
+          echo "stackql-command output is valid."
         else
-          echo "All lines in the output match the expected format."
-        fi
-
-        # Test JSON output
-        json_output="${{ steps.stackql-query.outputs.stackql-query-results }}"
-        if ! echo "$json_output" | jq empty; then
-          echo "JSON output is not valid."
+          echo "stackql-command output is invalid."
           exit 1
         fi
 
-        # Test CSV output
-        csv_output="${{ steps.stackql-query-csv-output.outputs.stackql-query-results }}"
-        IFS=',' read -ra ADDR <<< "$(echo "$csv_output" | head -n 1)"
-        if [ "${ADDR[0]}" != "visibility" ] || [ "${ADDR[1]}" != "number_of_repos" ]; then
-          echo "CSV header does not match expected format."
+        # Check JSON output from stackql-query
+        if ! echo "${{ steps.stackql-query.outputs.stackql-query-results }}" | jq empty; then
+          echo "JSON output from stackql-query is invalid."
           exit 1
         fi
 
-        # Test Table output
-        table_output="${{ steps.stackql-query-table-output.outputs.stackql-query-results }}"
-        table_header=$(echo "$table_output" | sed -n 2p)
-        if [[ "$table_header" != "| visibility | number_of_repos |" ]]; then
-          echo "Table header does not match expected format."
+        # Check CSV output from stackql-query-csv-output
+        csv_header="${{ steps.stackql-query-csv-output.outputs.stackql-query-results }}"
+        if ! echo "$csv_header" | head -n 1 | grep -q "visibility,number_of_repos"; then
+          echo "CSV header from stackql-query-csv-output is invalid."
           exit 1
         fi
 
-        # Test Text output (similar to CSV)
+        # Check Table output from stackql-query-table-output
+        table_header="${{ steps.stackql-query-table-output.outputs.stackql-query-results }}"
+        if ! echo "$table_header" | sed -n 2p | grep -q "| visibility | number_of_repos |"; then
+          echo "Table header from stackql-query-table-output is invalid."
+          exit 1
+        fi
+
+        # Check Text output from stackql-query-text-output
         text_output="${{ steps.stackql-query-text-output.outputs.stackql-query-results }}"
-        IFS=',' read -ra ADDR <<< "$(echo "$text_output" | head -n 1)"
-        if [ "${ADDR[0]}" != "visibility" ] || [ "${ADDR[1]}" != "number_of_repos" ]; then
-          echo "Text output does not match expected CSV format."
+        if ! echo "$text_output" | head -n 1 | grep -q "visibility,number_of_repos"; then
+          echo "Text output from stackql-query-text-output is invalid."
           exit 1
         fi
 
-        # Additional tests for JSON outputs from file, with vars, and with data file
-        for step_id in stackql-query-file stackql-query-file-with-vars stackql-query-file-with-data-file-and-vars; do
-          json_output="${{ steps[step_id].outputs.stackql-query-results }}"
-          if ! echo "$json_output" | jq empty; then
-            echo "$step_id output is not valid JSON."
-            exit 1
-          fi
-        done
+        # Check outputs from files and variable dependent queries
+        if ! echo "${{ steps.stackql-query-file.outputs.stackql-query-results }}" | jq empty; then
+          echo "JSON output from stackql-query-file is invalid."
+          exit 1
+        fi
+
+        if ! echo "${{ steps.stackql-query-file-with-vars.outputs.stackql-query-results }}" | jq empty; then
+          echo "JSON output from stackql-query-file-with-vars is invalid."
+          exit 1
+        fi
+
+        if ! echo "${{ steps.stackql-query-file-with-data-file-and-vars.outputs.stackql-query-results }}" | jq empty; then
+          echo "JSON output from stackql-query-file-with-data-file-and-vars is invalid."
+          exit 1
+        fi

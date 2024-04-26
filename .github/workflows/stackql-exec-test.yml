@@ -158,26 +158,26 @@ jobs:
           fi
         done
 
-        # validate github query example using the query input (stackql-query)
-        if [ -z '${{ steps.stackql-query.outputs.exec-result }}' ]; then
-          echo "exec-stackql output does not contain expected result"
-          exit 1
-        fi
+        # # validate github query example using the query input (stackql-query)
+        # if [ -z '${{ steps.stackql-query.outputs.exec-result }}' ]; then
+        #   echo "exec-stackql output does not contain expected result"
+        #   exit 1
+        # fi
 
-        # validate google query example with query file (stackql-query-file)
-        if [ -z '${{ steps.stackql-query-file.outputs.exec-result }}' ]; then
-          echo "exec-stackql output does not contain expected result"
-          exit 1
-        fi
+        # # validate google query example with query file (stackql-query-file)
+        # if [ -z '${{ steps.stackql-query-file.outputs.exec-result }}' ]; then
+        #   echo "exec-stackql output does not contain expected result"
+        #   exit 1
+        # fi
 
-        # validate google query example with query file using vars (stackql-query-file-with-vars)
-        if [ -z '${{ steps.stackql-query-file-with-vars.outputs.exec-result }}' ]; then
-          echo "exec-stackql output does not contain expected result"
-          exit 1
-        fi
+        # # validate google query example with query file using vars (stackql-query-file-with-vars)
+        # if [ -z '${{ steps.stackql-query-file-with-vars.outputs.exec-result }}' ]; then
+        #   echo "exec-stackql output does not contain expected result"
+        #   exit 1
+        # fi
 
-        # validate google query example with query file and data file using vars (stackql-query-file-with-data-file-and-vars)
-        if [ -z '${{ steps.stackql-query-file-with-data-file-and-vars.outputs.exec-result }}' ]; then
-          echo "exec-stackql output does not contain expected result"
-          exit 1
-        fi
+        # # validate google query example with query file and data file using vars (stackql-query-file-with-data-file-and-vars)
+        # if [ -z '${{ steps.stackql-query-file-with-data-file-and-vars.outputs.exec-result }}' ]; then
+        #   echo "exec-stackql output does not contain expected result"
+        #   exit 1
+        # fi

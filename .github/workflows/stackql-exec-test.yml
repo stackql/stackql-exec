@@ -32,18 +32,6 @@ jobs:
     # run a query using the `query` input
     #
     - name: github query example using the query input
-      id: stackql-query-test
-      uses: ./
-      with:
-        query: "select visibility, count(*) as number_of_repos from github.repos.repos where org = 'stackql' group by visibility"
-      env: 
-        STACKQL_GITHUB_USERNAME: ${{  secrets.STACKQL_GITHUB_USERNAME }}
-        STACKQL_GITHUB_PASSWORD: ${{  secrets.STACKQL_GITHUB_PASSWORD }}
-
-    #
-    # run a query using the `query` input
-    #
-    - name: github query example using the query input
       id: stackql-query
       uses: ./
       with:
@@ -144,19 +132,27 @@ jobs:
     - name: validate stackql-exec output
       shell: bash
       run: |
-        # Get the output of the pull providers command (stackql-command)
-        output="${{ steps.stackql-command.outputs.exec-result }}"
-        regex="([a-zA-Z]+) provider, version 'v[0-9.]+' successfully installed"
+        # test `stackql-command`
+        output="${{ steps.stackql-command.outputs.stackql-command-output }}"
+        regex="([a-zA-Z]+) provider, version 'v[0-9.]+ successfully installed"
+        all_passed=true
         echo "$output" | while IFS= read -r line; do
           # Skip empty lines
           if [[ -z "$line" ]]; then
             continue
           fi
+          # Validate against the regex
           if ! echo "$line" | grep -qE "$regex"; then
-            echo "failed line: $line"
-            exit 1
+            echo "Failed line: $line"
+            all_passed=false
           fi
         done
+        if [[ "$all_passed" == "true" ]]; then
+          echo "All lines in the output match the expected format."
+        else
+          echo "One or more lines in the output failed to match the expected format."
+          exit 1
+        fi
 
         # # validate github query example using the query input (stackql-query)
         # if [ -z '${{ steps.stackql-query.outputs.exec-result }}' ]; then

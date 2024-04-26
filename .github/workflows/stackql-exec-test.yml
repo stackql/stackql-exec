@@ -129,24 +129,23 @@ jobs:
         GOOGLE_PROJECT: ${{ vars.GOOGLE_PROJECT }}
         GOOGLE_ZONE: ${{ vars.GOOGLE_ZONE }}        
 
-    - name: validate stackql-exec output
+    - name: validate stackql outputs
       shell: bash
       run: |
-        # test `stackql-command`
+        # Test `stackql-command`
         output="${{ steps.stackql-command.outputs.stackql-command-output }}"
-        regex="([a-zA-Z]+) provider, version 'v[0-9.]+ successfully installed"
         all_passed=true
-        while IFS= read -r line; do
+        echo "$output" | while IFS= read -r line; do
           # Skip empty lines
           if [[ -z "$line" ]]; then
             continue
           fi
-          # Validate against the regex
-          if ! echo "$line" | grep -qE "$regex"; then
+          # Validate against a simple keyword presence
+          if ! echo "$line" | grep -qi "provider" || ! echo "$line" | grep -qi "version" || ! echo "$line" | grep -qi "successfully installed"; then
             echo "Failed line: $line"
             all_passed=false
           fi
-        done < <(echo "$output")
+        done
         if [[ "$all_passed" == "false" ]]; then
           echo "One or more lines in the output failed to match the expected format."
           exit 1

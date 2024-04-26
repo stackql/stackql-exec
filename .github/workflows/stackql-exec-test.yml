@@ -136,7 +136,7 @@ jobs:
         output="${{ steps.stackql-command.outputs.stackql-command-output }}"
         regex="([a-zA-Z]+) provider, version 'v[0-9.]+ successfully installed"
         all_passed=true
-        echo "$output" | while IFS= read -r line; do
+        while IFS= read -r line; do
           # Skip empty lines
           if [[ -z "$line" ]]; then
             continue
@@ -146,13 +146,14 @@ jobs:
             echo "Failed line: $line"
             all_passed=false
           fi
-        done
-        if [[ "$all_passed" == "true" ]]; then
-          echo "All lines in the output match the expected format."
-        else
+        done < <(echo "$output")
+        if [[ "$all_passed" == "false" ]]; then
           echo "One or more lines in the output failed to match the expected format."
           exit 1
+        else
+          echo "All lines in the output match the expected format."
         fi
+
 
         # # validate github query example using the query input (stackql-query)
         # if [ -z '${{ steps.stackql-query.outputs.exec-result }}' ]; then

@@ -153,27 +153,42 @@ jobs:
           echo "All lines in the output match the expected format."
         fi
 
+        # Test JSON output
+        json_output="${{ steps.stackql-query.outputs.stackql-query-results }}"
+        if ! echo "$json_output" | jq empty; then
+          echo "JSON output is not valid."
+          exit 1
+        fi
 
-        # # validate github query example using the query input (stackql-query)
-        # if [ -z '${{ steps.stackql-query.outputs.exec-result }}' ]; then
-        #   echo "exec-stackql output does not contain expected result"
-        #   exit 1
-        # fi
+        # Test CSV output
+        csv_output="${{ steps.stackql-query-csv-output.outputs.stackql-query-results }}"
+        IFS=',' read -ra ADDR <<< "$(echo "$csv_output" | head -n 1)"
+        if [ "${ADDR[0]}" != "visibility" ] || [ "${ADDR[1]}" != "number_of_repos" ]; then
+          echo "CSV header does not match expected format."
+          exit 1
+        fi
 
-        # # validate google query example with query file (stackql-query-file)
-        # if [ -z '${{ steps.stackql-query-file.outputs.exec-result }}' ]; then
-        #   echo "exec-stackql output does not contain expected result"
-        #   exit 1
-        # fi
+        # Test Table output
+        table_output="${{ steps.stackql-query-table-output.outputs.stackql-query-results }}"
+        table_header=$(echo "$table_output" | sed -n 2p)
+        if [[ "$table_header" != "| visibility | number_of_repos |" ]]; then
+          echo "Table header does not match expected format."
+          exit 1
+        fi
 
-        # # validate google query example with query file using vars (stackql-query-file-with-vars)
-        # if [ -z '${{ steps.stackql-query-file-with-vars.outputs.exec-result }}' ]; then
-        #   echo "exec-stackql output does not contain expected result"
-        #   exit 1
-        # fi
+        # Test Text output (similar to CSV)
+        text_output="${{ steps.stackql-query-text-output.outputs.stackql-query-results }}"
+        IFS=',' read -ra ADDR <<< "$(echo "$text_output" | head -n 1)"
+        if [ "${ADDR[0]}" != "visibility" ] || [ "${ADDR[1]}" != "number_of_repos" ]; then
+          echo "Text output does not match expected CSV format."
+          exit 1
+        fi
 
-        # # validate google query example with query file and data file using vars (stackql-query-file-with-data-file-and-vars)
-        # if [ -z '${{ steps.stackql-query-file-with-data-file-and-vars.outputs.exec-result }}' ]; then
-        #   echo "exec-stackql output does not contain expected result"
-        #   exit 1
-        # fi
+        # Additional tests for JSON outputs from file, with vars, and with data file
+        for step_id in stackql-query-file stackql-query-file-with-vars stackql-query-file-with-data-file-and-vars; do
+          json_output="${{ steps[step_id].outputs.stackql-query-results }}"
+          if ! echo "$json_output" | jq empty; then
+            echo "$step_id output is not valid JSON."
+            exit 1
+          fi
+        done

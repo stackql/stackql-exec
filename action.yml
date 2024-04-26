@@ -15,7 +15,7 @@ inputs:
     description: comma delimited list of vars to be passed to query preprocessor (supported with jsonnet config blocks or jsonnet data files only)
     required: false
   query_output:
-    description: output format, supported formats include `json` (default), `csv`, `table` and `text`
+    description: output format for queries (ignored is `is_command` is `true`), supported formats include `json` (default), `csv`, `table` and `text`
     default: 'json'
     required: false
   auth_obj_path:
@@ -28,13 +28,20 @@ inputs:
     description: "Set to true if the stackql execution is a command that does not return data"
     required: false
     default: 'false'
+  on_failure:
+    description: behavior on a failure in query, supported values are `exit` (default) and `continue`
+    required: false
+    default: 'exit'
 outputs:
-  exec-result:
-    description: "stdout of stackql command"
-    value: ${{ steps.exec-stackql.outputs.stdout }}
-  exec-error:
-    description: "stderr of stackql command"
-    value: ${{ steps.exec-stackql.outputs.stderr }}
+  stackql-query-results:
+    description: results from a stackql query (in the format specified)
+    value: ${{ steps.exec-stackql.outputs.stackql-query-results }}
+  stackql-command-output:
+    description: text output from a stackql command (a query that does not return data)
+    value: ${{ steps.exec-stackql.outputs.stackql-command-output }}	
+  stackql-query-error:
+    description: error from a stackql query
+    value: ${{ steps.exec-stackql.outputs.stackql-query-error }}
 runs:
   using: "composite"
   steps:
@@ -95,10 +102,11 @@ runs:
           const path = require('path');
           const utilsPath = path.join(process.env.GITHUB_ACTION_PATH, 'lib', 'utils.js')
           const {execStackQLQuery} = require(utilsPath);
-          // Use await here since execStackQLQuery is an async function
-          await execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true');
+          const onFailure = process.env.ON_FAILURE || 'exit';  // default to 'exit' if not specified
+          await execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true', onFailure);
       env:
           IS_COMMAND: ${{ inputs.is_command }}
+          ON_FAILURE: ${{ inputs.on_failure }}          
 
 branding:
   icon: 'terminal'

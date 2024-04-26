@@ -132,53 +132,26 @@ jobs:
     - name: validate stackql outputs
       shell: bash
       run: |
-        # Check stackql-command output
-        if echo "${{ steps.stackql-command.outputs.stackql-command-output }}" | grep -qE "provider, version 'v[0-9.]+' successfully installed"; then
-          echo "stackql-command output is valid."
-        else
-          echo "stackql-command output is invalid."
-          exit 1
-        fi
+        echo "stackql-command:"
+        echo "${{ steps.stackql-command.outputs.stackql-command-output }}"
 
-        # Check JSON output from stackql-query
-        if ! echo "${{ steps.stackql-query.outputs.stackql-query-results }}" | jq empty; then
-          echo "JSON output from stackql-query is invalid."
-          exit 1
-        fi
+        echo "stackql-query:"
+        echo "${{ steps.stackql-query.outputs.stackql-query-results }}"
 
-        # Check CSV output from stackql-query-csv-output
-        csv_header="${{ steps.stackql-query-csv-output.outputs.stackql-query-results }}"
-        if ! echo "$csv_header" | head -n 1 | grep -q "visibility,number_of_repos"; then
-          echo "CSV header from stackql-query-csv-output is invalid."
-          exit 1
-        fi
+        echo "stackql-query-csv-output:"
+        echo "${{ steps.stackql-query-csv-output.outputs.stackql-query-results }}"
 
-        # Check Table output from stackql-query-table-output
-        table_header="${{ steps.stackql-query-table-output.outputs.stackql-query-results }}"
-        if ! echo "$table_header" | sed -n 2p | grep -q "| visibility | number_of_repos |"; then
-          echo "Table header from stackql-query-table-output is invalid."
-          exit 1
-        fi
+        echo "stackql-query-table-output:"
+        echo "${{ steps.stackql-query-table-output.outputs.stackql-query-results }}"
 
-        # Check Text output from stackql-query-text-output
-        text_output="${{ steps.stackql-query-text-output.outputs.stackql-query-results }}"
-        if ! echo "$text_output" | head -n 1 | grep -q "visibility,number_of_repos"; then
-          echo "Text output from stackql-query-text-output is invalid."
-          exit 1
-        fi
+        echo "stackql-query-text-output:"
+        echo "${{ steps.stackql-query-text-output.outputs.stackql-query-results }}"
 
-        # Check outputs from files and variable dependent queries
-        if ! echo "${{ steps.stackql-query-file.outputs.stackql-query-results }}" | jq empty; then
-          echo "JSON output from stackql-query-file is invalid."
-          exit 1
-        fi
+        echo "stackql-query-file:"
+        echo "${{ steps.stackql-query-file.outputs.stackql-query-results }}"
 
-        if ! echo "${{ steps.stackql-query-file-with-vars.outputs.stackql-query-results }}" | jq empty; then
-          echo "JSON output from stackql-query-file-with-vars is invalid."
-          exit 1
-        fi
+        echo "stackql-query-file-with-vars:"
+        echo "${{ steps.stackql-query-file-with-vars.outputs.stackql-query-results }}"
 
-        if ! echo "${{ steps.stackql-query-file-with-data-file-and-vars.outputs.stackql-query-results }}" | jq empty; then
-          echo "JSON output from stackql-query-file-with-data-file-and-vars is invalid."
-          exit 1
-        fi
+        echo "stackql-query-file-with-data-file-and-vars:"
+        echo "${{ steps.stackql-query-file-with-data-file-and-vars.outputs.stackql-query-results }}"

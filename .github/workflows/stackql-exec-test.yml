@@ -32,15 +32,6 @@ jobs:
     # run a query using the `query` input
     #
     - name: github query example using the query input
-      id: stackql-query-test-bad
-      uses: ./
-      with:
-        query: "SELECT * FROM FRED"
-
-    #
-    # run a query using the `query` input
-    #
-    - name: github query example using the query input
       id: stackql-query-test
       uses: ./
       with:

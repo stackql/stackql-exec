@@ -117,7 +117,7 @@ jobs:
     #
     # run a query using the `query_file_path`, `data_file_path` and `vars` inputs (dry-run)
     #
-    - name: google query example with query file and data file using vars
+    - name: google query example with query file and data file using vars (dry-run)
       id: stackql-query-file-with-data-file-and-vars-dry-run
       uses: ./
       with:

@@ -111,6 +111,7 @@ runs:
           await execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true', onFailure, process.env.DRY_RUN === 'true');
       env:
           IS_COMMAND: ${{ inputs.is_command }}
+          DRY_RUN: ${{ inputs.dry_run }}
           ON_FAILURE: ${{ inputs.on_failure }}          
 
 branding:

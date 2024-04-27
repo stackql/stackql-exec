@@ -11,6 +11,10 @@ inputs:
   data_file_path:
     description: jsonnet or json data file to be passed to query preprocessor
     required: false
+  dry_run:
+    description: set to true to print the query that would be executed without actually executing it (default is false)
+    required: false
+    default: 'false'
   vars:
     description: comma delimited list of vars to be passed to query preprocessor (supported with jsonnet config blocks or jsonnet data files only)
     required: false
@@ -91,6 +95,7 @@ runs:
         QUERY_FILE_PATH: ${{ inputs.query_file_path }}
         QUERY: ${{inputs.query}}
         DATA_FILE_PATH: ${{inputs.data_file_path}}
+        DRY_RUN: ${{inputs.dry_run}}
         OUTPUT: ${{inputs.query_output}}
         VARS: ${{inputs.vars}}
     
@@ -103,7 +108,7 @@ runs:
           const utilsPath = path.join(process.env.GITHUB_ACTION_PATH, 'lib', 'utils.js')
           const {execStackQLQuery} = require(utilsPath);
           const onFailure = process.env.ON_FAILURE || 'exit';  // default to 'exit' if not specified
-          await execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true', onFailure);
+          await execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true', onFailure, process.env.DRY_RUN === 'true');
       env:
           IS_COMMAND: ${{ inputs.is_command }}
           ON_FAILURE: ${{ inputs.on_failure }}          

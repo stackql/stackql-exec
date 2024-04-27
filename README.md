@@ -7,21 +7,24 @@ Github Action as a wrapper for executing a single command in stackql, maps all s
 Authentication to StackQL providers is done via environment variables source from GitHub Actions Secrets.  To learn more about authentication, see the setup instructions for your provider or providers at the [StackQL Provider Registry Docs](https://stackql.io/registry).  
 
 ## Inputs
-- `query` - stackql query to execute **(need to supply either `query` or `query_file_path`)**
-- `query_file_path` - stackql query file to execute **(need to supply either `query` or `query_file_path`)**
-- `data_file_path` - (optional) path to data file to pass to the stackql query preprocessor (`json` or `jsonnet`)
-- `vars` - (optional) comma delimited list of variables to pass to the stackql query preprocessor (supported with `jsonnet` config blocks or `jsonnet` data files only), accepts `var1=val1,var2=val2`, can be used to source environment variables into stackql queries 
-- `query_output` - (optional) output format of the stackql exec result, accepts `table`, `csv`, `json` and `text`, defaults to `json`
-- `auth_obj_path` - (optional) the path of json file that stores stackql AUTH string **(only required when using non-standard environment variable names)**
-- `auth_str` - (optional) stackql AUTH string **(only required when using non-standard environment variable names)**
-- `is_command` - (optional defaults to 'false') set to true if the stackql execution is a command that does not return data
+- **`query`** - stackql query to execute *(need to supply either __`query`__ or __`query_file_path`__)*
+- **`query_file_path`** - stackql query file to execute *(need to supply either __`query`__ or __`query_file_path`__)*
+- **`data_file_path`** - (optional) path to data file to pass to the stackql query preprocessor (`json` or `jsonnet`)
+- **`dry_run`** - (optional) set to `true` to print the query that would be executed without actually executing it (default is `false`)
+- **`vars`** - (optional) comma delimited list of variables to pass to the stackql query preprocessor (supported with `jsonnet` config blocks or `jsonnet` data files only), accepts `var1=val1,var2=val2`, can be used to source environment variables into stackql queries 
+- **`query_output`** - (optional) output format of the stackql exec result, accepts `table`, `csv`, `json` and `text`, defaults to `json`
+- **`auth_obj_path`** - (optional) the path of json file that stores stackql AUTH string *(only required when using non-standard environment variable names)*
+- **`auth_str`** - (optional) stackql AUTH string *(only required when using non-standard environment variable names)*
+- **`is_command`** - (optional) set to `true` if the stackql execution is a command that does not return data (defaults to `false`)
+- **`on_failure`** - (optional) behavior on a failure in query, supported values are `exit` (default) and `continue`
 
 ## Outputs
 This action uses [setup-stackql](https://github.com/marketplace/actions/stackql-studio-setup-stackql), with use_wrapper set
 to `true`, `stdout` and `stderr` are set to `exec-result` and `exec-error`
 
-- `exec-result` - The STDOUT stream of the call to the `stackql` binary.
-- `exec-error` - The STDERR stream of the call to the `stackql` binary.
+- **`stackql-query-results`** - results from a stackql query (in the format specified)
+- **`stackql-command-output`** - text output from a stackql command (a query that does not return data)
+- **`stackql-query-error`** - error from a stackql query
 
 ## Examples
 

@@ -1,3 +1,5 @@
+[![StackQL Exec](https://github.com/stackql/stackql-exec/actions/workflows/stackql-exec-test.yml/badge.svg)](https://github.com/stackql/stackql-exec/actions/workflows/stackql-exec-test.yml)  
+
 # stackql-exec
 Github Action as a wrapper for executing a single command in stackql, maps all stackql exec args to actions args
 
@@ -19,12 +21,12 @@ Authentication to StackQL providers is done via environment variables source fro
 - **`on_failure`** - (optional) behavior on a failure in query, supported values are `exit` (default) and `continue`
 
 ## Outputs
-This action uses [setup-stackql](https://github.com/marketplace/actions/stackql-studio-setup-stackql), with use_wrapper set
-to `true`, `stdout` and `stderr` are set to `exec-result` and `exec-error`
 
 - **`stackql-query-results`** - results from a stackql query (in the format specified)
 - **`stackql-command-output`** - text output from a stackql command (a query that does not return data)
 - **`stackql-query-error`** - error from a stackql query
+
+> This action uses [setup-stackql](https://github.com/marketplace/actions/stackql-studios-setup-stackql)
 
 ## Examples
 

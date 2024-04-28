@@ -1,4 +1,4 @@
-name: 'stackql query tests'
+name: 'stackql-exec tests'
 
 on:
   push:
@@ -111,6 +111,21 @@ jobs:
         vars: GOOGLE_PROJECT=${{ env.GOOGLE_PROJECT }},GOOGLE_ZONE=${{ env.GOOGLE_ZONE }}
       env: 
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_PROJECT: ${{ vars.GOOGLE_PROJECT }}
+        GOOGLE_ZONE: ${{ vars.GOOGLE_ZONE }}
+
+    #
+    # run a query using the `query_file_path`, `data_file_path` and `vars` inputs (dry-run)
+    #
+    - name: google query example with query file and data file using vars (dry-run)
+      id: stackql-query-file-with-data-file-and-vars-dry-run
+      uses: ./
+      with:
+        query_file_path: './stackql_scripts/google-instances-by-status-with-external-data-file.iql'
+        data_file_path: './stackql_scripts/google-instances-by-status-with-external-data-file.jsonnet'
+        vars: GOOGLE_PROJECT=${{ env.GOOGLE_PROJECT }},GOOGLE_ZONE=${{ env.GOOGLE_ZONE }}
+        dry_run: true
+      env: 
         GOOGLE_PROJECT: ${{ vars.GOOGLE_PROJECT }}
         GOOGLE_ZONE: ${{ vars.GOOGLE_ZONE }}
 

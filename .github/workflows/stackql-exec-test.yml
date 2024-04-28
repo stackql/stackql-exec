@@ -1,4 +1,4 @@
-name: 'stackql query tests'
+name: 'stackql-exec tests'
 
 on:
   push:

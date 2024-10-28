@@ -26,7 +26,7 @@ Authentication to StackQL providers is done via environment variables source fro
 - **`stackql-command-output`** - text output from a stackql command (a query that does not return data)
 - **`stackql-query-error`** - error from a stackql query
 
-> This action uses [setup-stackql](https://github.com/marketplace/actions/stackql-studios-setup-stackql)
+> This action uses [setup-stackql](https://github.com/marketplace/actions/setup-stackql)
 
 ## Examples
 

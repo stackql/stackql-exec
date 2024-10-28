@@ -1,4 +1,4 @@
 SELECT status, count(*) as num_instances
 FROM google.compute.instances
-WHERE project = 'stackql-demo'
+WHERE project = 'stackql-integration-tests'
 GROUP BY status;

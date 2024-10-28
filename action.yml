@@ -1,4 +1,4 @@
-name: 'StackQL Studios - StackQL Exec'
+name: 'stackql-exec'
 description: 'A wrapper for executing a single command, maps all stackql exec args to actions args (supplied using with.)'
 author: 'Yuncheng Yang, StackQL Studios'
 inputs:
@@ -60,7 +60,7 @@ runs:
         fi
 
     - name: Setup StackQL
-      uses: stackql/setup-stackql@v2.2.1
+      uses: stackql/setup-stackql@v2.2.2
       if: ${{steps.check-stackql.outputs.stackql_installed == 'false'}}
       with:
         use_wrapper: true
@@ -116,4 +116,4 @@ runs:
 
 branding:
   icon: 'terminal'
-  color: 'green'
+  color: 'blue'

@@ -84,6 +84,7 @@ runs:
         AUTH_STR: ${{inputs.auth_str}}
 
     - name: get stackql command
+      id: get-command
       uses: actions/github-script@v8
       with:
         script: |
@@ -98,7 +99,10 @@ runs:
         DRY_RUN: ${{inputs.dry_run}}
         OUTPUT: ${{inputs.query_output}}
         VARS: ${{inputs.vars}}
-    
+        # Scoped to this invocation via the setup-auth step output - not GITHUB_ENV -
+        # so auth never carries over from another step in the job.
+        AUTH: ${{ steps.setup-auth.outputs.auth }}
+
     - name: execute stackql command
       uses: actions/github-script@v8
       id: exec-stackql
@@ -110,9 +114,11 @@ runs:
           const onFailure = process.env.ON_FAILURE || 'exit';  // default to 'exit' if not specified
           await execStackQLQuery(core, process.env.STACKQL_COMMAND, process.env.IS_COMMAND === 'true', onFailure, process.env.DRY_RUN === 'true');
       env:
+          # Consumed from the get-command step output, not GITHUB_ENV.
+          STACKQL_COMMAND: ${{ steps.get-command.outputs.stackql_command }}
           IS_COMMAND: ${{ inputs.is_command }}
           DRY_RUN: ${{ inputs.dry_run }}
-          ON_FAILURE: ${{ inputs.on_failure }}          
+          ON_FAILURE: ${{ inputs.on_failure }}
 
 branding:
   icon: 'terminal'

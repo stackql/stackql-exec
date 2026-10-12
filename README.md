@@ -28,6 +28,20 @@ Authentication to StackQL providers is done via environment variables source fro
 
 > This action uses [setup-stackql](https://github.com/marketplace/actions/setup-stackql)
 
+Windows ARM64 runners use the native binary installed by `setup-stackql`. Existing plain `stackql.exe` installations on `PATH` and wrapped installations are both supported.
+
+## Supported platforms
+
+| Platform | x64 runner | ARM64 runner |
+| --- | --- | --- |
+| Linux | `ubuntu-24.04` | `ubuntu-24.04-arm` |
+| Windows | `windows-2025` | `windows-11-arm` |
+| macOS | `macos-15-intel` | `macos-15` |
+
+CI runs unit tests and integration tests on all six combinations. Smoke tests need no cloud credentials and cover automatic setup, preinstalled wrapped binaries, and preinstalled plain binaries. On macOS, `setup-stackql` uses Homebrew and does not install a wrapper.
+
+Smoke tests verify the native binary architecture, multiline queries, query and data paths containing spaces, variables, dry runs, and all four output formats. Provider integration tests additionally use the repository's GitHub and Google credentials.
+
 ## Examples
 
 ### Inline `stackql` query example
@@ -130,6 +144,6 @@ workflow excerpt:
 To run unit tests locally against this action, use the following:
 
 ```
-npm i
-npm run test lib/tests/utils.test.js
+npm ci --ignore-scripts
+npm test -- --runInBand
 ```

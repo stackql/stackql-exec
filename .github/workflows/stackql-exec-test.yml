@@ -6,10 +6,221 @@ on:
     - main
   pull_request:
 jobs:
+  unit-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+        - { os: ubuntu-24.04, arch: x64 }
+        - { os: ubuntu-24.04-arm, arch: arm64 }
+        - { os: windows-2025, arch: x64 }
+        - { os: windows-11-arm, arch: arm64 }
+        - { os: macos-15-intel, arch: x64 }
+        - { os: macos-15, arch: arm64 }
+    runs-on: ${{ matrix.target.os }}
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
+      with:
+        node-version: '24'
+        architecture: ${{ matrix.target.arch }}
+    - name: Verify native Node architecture
+      env:
+        EXPECTED_ARCH: ${{ matrix.target.arch }}
+      run: node -e "const assert = require('assert/strict'); assert.equal(process.arch, process.env.EXPECTED_ARCH); assert.equal(process.env.RUNNER_ARCH.toLowerCase(), process.env.EXPECTED_ARCH);"
+    - run: npm ci --ignore-scripts
+    - run: npm test -- --runInBand
+
+  smoke-tests:
+    name: Smoke (${{ matrix.target.os }}, ${{ matrix.install }})
+    runs-on: ${{ matrix.target.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+        - { os: ubuntu-24.04, arch: X64 }
+        - { os: ubuntu-24.04-arm, arch: ARM64 }
+        - { os: windows-2025, arch: X64 }
+        - { os: windows-11-arm, arch: ARM64 }
+        - { os: macos-15-intel, arch: X64 }
+        - { os: macos-15, arch: ARM64 }
+        install: [automatic, wrapped, plain]
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Verify runner and clean installation
+      env:
+        EXPECTED_ARCH: ${{ matrix.target.arch }}
+      run: |
+        test "$RUNNER_ARCH" = "$EXPECTED_ARCH"
+        if command -v stackql; then
+          echo 'Expected a runner without StackQL installed'
+          exit 1
+        fi
+
+    - name: Preinstall StackQL
+      if: matrix.install != 'automatic'
+      uses: stackql/setup-stackql@v2
+      with:
+        use_wrapper: ${{ matrix.install == 'wrapped' }}
+
+    - name: Exercise a Windows wrapper path containing spaces
+      if: runner.os == 'Windows' && matrix.install == 'wrapped'
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const target = path.join(process.env.RUNNER_TEMP, 'StackQL Tools');
+          fs.mkdirSync(target);
+          for (const name of ['stackql', 'stackql-bin.exe']) {
+            fs.copyFileSync(path.join(process.env.STACKQL_CLI_PATH, name), path.join(target, name));
+          }
+          core.exportVariable('STACKQL_CLI_PATH', target);
+          core.addPath(target);
+
+    - name: Execute a multiline query
+      id: inline
+      uses: ./
+      with:
+        query: |
+          SELECT
+            'stackql smoke' AS result;
+
+    - name: Verify installation mode
+      env:
+        INSTALL_MODE: ${{ matrix.install }}
+      run: |
+        if [[ "$RUNNER_OS" == 'macOS' || "$INSTALL_MODE" == 'plain' ]]; then
+          test -z "${STACKQL_CLI_PATH:-}"
+        else
+          test -n "${STACKQL_CLI_PATH:-}"
+        fi
+
+    - name: Verify native Windows binary architecture
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $binary = if ($env:STACKQL_CLI_PATH) {
+          Join-Path $env:STACKQL_CLI_PATH 'stackql-bin.exe'
+        } else {
+          (Get-Command stackql.exe).Source
+        }
+        $bytes = [IO.File]::ReadAllBytes($binary)
+        $pe = [BitConverter]::ToInt32($bytes, 0x3c)
+        $machine = [BitConverter]::ToUInt16($bytes, $pe + 4)
+        $expected = if ($env:RUNNER_ARCH -eq 'ARM64') { 0xaa64 } else { 0x8664 }
+        if ($machine -ne $expected) { throw 'Installed binary does not match runner architecture' }
+
+    - name: Verify native Linux or macOS binary architecture
+      if: runner.os != 'Windows'
+      run: |
+        binary="$(command -v stackql)"
+        if [[ -n "${STACKQL_CLI_PATH:-}" ]]; then
+          binary="$STACKQL_CLI_PATH/stackql-bin"
+        fi
+        if [[ "$RUNNER_OS" == 'macOS' ]]; then
+          arch=x86_64
+          if [[ "$RUNNER_ARCH" == 'ARM64' ]]; then arch=arm64; fi
+          lipo "$binary" -verify_arch "$arch"
+        else
+          arch='x86-64'
+          if [[ "$RUNNER_ARCH" == 'ARM64' ]]; then arch='ARM aarch64'; fi
+          file "$binary" | grep -E "ELF 64-bit.*$arch"
+        fi
+
+    - name: Create query and data files in a path containing spaces
+      id: fixtures
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const dir = path.join(process.env.RUNNER_TEMP, 'StackQL queries');
+          fs.mkdirSync(dir);
+          const query = path.join(dir, 'query file.iql');
+          const data = path.join(dir, 'query data.jsonnet');
+          fs.writeFileSync(query, "SELECT '{{ .value }}' AS result;");
+          fs.writeFileSync(data, '{value: std.extVar("VALUE")}');
+          core.setOutput('query', query);
+          core.setOutput('data', data);
+
+    - name: Execute a query file with data and variables
+      id: file
+      uses: ./
+      with:
+        query_file_path: ${{ steps.fixtures.outputs.query }}
+        data_file_path: ${{ steps.fixtures.outputs.data }}
+        vars: VALUE=stackql smoke
+
+    - name: Dry run a query file with data and variables
+      id: dryrun
+      uses: ./
+      with:
+        query_file_path: ${{ steps.fixtures.outputs.query }}
+        data_file_path: ${{ steps.fixtures.outputs.data }}
+        vars: VALUE=stackql smoke
+        dry_run: true
+
+    - name: Execute a CSV query
+      id: csv
+      uses: ./
+      with:
+        query: SELECT 'stackql smoke' AS result;
+        query_output: csv
+
+    - name: Execute a table query
+      id: table
+      uses: ./
+      with:
+        query: SELECT 'stackql smoke' AS result;
+        query_output: table
+
+    - name: Execute a text query
+      id: text
+      uses: ./
+      with:
+        query: SELECT 'stackql smoke' AS result;
+        query_output: text
+
+    - name: Assert action outputs
+      uses: actions/github-script@v8
+      env:
+        RESULTS: ${{ toJSON(steps) }}
+      with:
+        script: |
+          const assert = require('assert/strict');
+          const steps = JSON.parse(process.env.RESULTS);
+          const output = id => steps[id].outputs['stackql-query-results'];
+          for (const id of ['inline', 'file', 'dryrun', 'csv', 'table', 'text']) {
+            assert.ok(output(id), `${id} returned no results`);
+            assert.ok(!steps[id].outputs['stackql-query-error'], `${id} returned an error`);
+          }
+          for (const id of ['inline', 'file']) {
+            const rows = JSON.parse(output(id));
+            assert.equal(rows.length, 1);
+            const value = rows[0].result;
+            if (value !== null && typeof value === 'object') {
+              assert.deepEqual(value, {String: 'stackql smoke', Valid: true});
+            } else {
+              assert.equal(value, 'stackql smoke');
+            }
+          }
+          assert.deepEqual(JSON.parse(output('dryrun')), [{query: "SELECT 'stackql smoke' AS result;"}]);
+          for (const id of ['csv', 'text']) {
+            assert.equal(output(id).replace(/\r\n/g, '\n').trim(), 'result\nstackql smoke');
+          }
+          assert.match(output('table'), /\|\s*result\s*\|/);
+          assert.match(output('table'), /\|\s*stackql smoke\s*\|/);
+
   stackql-exec-google-example:
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-24.04, ubuntu-24.04-arm, windows-2025, windows-11-arm, macos-15-intel, macos-15]
     runs-on: ${{matrix.os}}
     name: 'StackQL exec Google '
 
